@@ -1,0 +1,282 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // One shared studio, with role-scoped access. Not a multi-tenant ruleset.
+    function signedIn() { return request.auth != null; }
+    function self(uid) { return signedIn() && request.auth.uid == uid; }
+    function profile() { return get(/databases/$(database)/documents/users/$(request.auth.uid)).data; }
+    function ownerIdentity() {
+      return signedIn() && request.auth.token.email.lower() == 'krm04094@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
+    function active() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && profile().active == true
+        && (request.auth.token.email.lower() != 'krm04094@gmail.com' || ownerIdentity())
+        && (profile().role != 'admin' || ownerIdentity());
+    }
+    function role(r) { return active() && profile().role == r; }
+    function roles(rs) { return active() && profile().role in rs; }
+    function admin() { return role('admin'); }
+    function str(v, max) { return v is string && v.size() <= max; }
+    function text(v, max) { return str(v, max) && v.size() > 0; }
+    function amount(v, max) { return v is number && v >= 0 && v <= max; }
+    function url(v) { return str(v, 2048) && (v == '' || v.matches('https://[^ ]+')); }
+    function knownRole(r) { return r in ['admin','designer','coordinator','marketer','analyst','documenter','faculty']; }
+
+    function validUser(d) {
+      return d.keys().hasAll(['name','email','role','active'])
+        && d.keys().hasOnly(['name','email','role','active','enrollment','joinCodeHash'])
+        && text(d.name,100) && text(d.email,254)
+        && knownRole(d.role) && d.active is bool
+        && d.get('enrollment','legacy') in ['legacy','student','managed','self']
+        // Legacy code hashes are accepted only on existing student-enrollment profiles.
+        && (!('joinCodeHash' in d) || (d.get('enrollment','legacy') == 'student'
+          && d.joinCodeHash is string && d.joinCodeHash.matches('[a-f0-9]{64}')));
+    }
+    function validSelfAdmission(d) {
+      return d.role in ['designer','documenter','faculty','coordinator','marketer','analyst'] && d.active == true
+        && d.get('enrollment','') in ['self','student'] && !('joinCodeHash' in d)
+        && request.auth.token.email.lower() != 'krm04094@gmail.com';
+    }
+    match /users/{uid} {
+      // Any signed-in user can inspect their own status; studio access also needs active().
+      allow get: if self(uid) || admin();
+      allow list: if admin();
+      allow create: if validUser(request.resource.data) && (
+        (self(uid) && request.resource.data.email == request.auth.token.email
+          && ((ownerIdentity() && request.resource.data.role == 'admin'
+                && request.resource.data.active == true && request.resource.data.get('enrollment','') == 'managed')
+            || validSelfAdmission(request.resource.data)))
+        || (admin() && !self(uid) && request.resource.data.role != 'admin'
+          && request.resource.data.get('enrollment','') == 'managed')
+      );
+      allow update: if validUser(request.resource.data)
+        && request.resource.data.email == resource.data.email
+        && (
+          (admin() && !self(uid) && request.resource.data.role != 'admin')
+          || (self(uid) && ownerIdentity() && request.resource.data.email == request.auth.token.email
+            && request.resource.data.role == 'admin' && request.resource.data.active == true
+            && request.resource.data.get('enrollment','') == 'managed')
+          || (self(uid) && active()
+            && request.resource.data.role != 'admin'
+            && request.auth.token.email.lower() != 'krm04094@gmail.com'
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name','role']))
+        );
+      // A disabled profile cannot be deleted and recreated to bypass suspension.
+      allow delete: if false;
+    }
+
+    match /settings/studio {
+      allow read: if active();
+      allow create, update: if admin()
+        && request.resource.data.keys().hasOnly(['studioName','tagline','cloudName','cloudPreset'])
+        && str(request.resource.data.get('studioName',''),100)
+        && str(request.resource.data.get('tagline',''),150)
+        && str(request.resource.data.get('cloudName',''),100)
+        && str(request.resource.data.get('cloudPreset',''),200);
+      allow delete: if false;
+    }
+
+    function validDesign(d) {
+      return d.keys().hasAll(['name','brand','cat','season','price','sizes','fabric','img','status','date','ownerId','reviewedBy'])
+        && d.keys().hasOnly(['name','brand','cat','season','price','sizes','fabric','img','status','date','ownerId','reviewedBy'])
+        && text(d.name,100) && text(d.brand,100)
+        && d.cat in ['Casual','Party','School','Seasonal','Accessories']
+        && d.season in ['All','Spring','Summer','Autumn','Winter']
+        && amount(d.price,1000000) && d.price > 0
+        && str(d.sizes,100) && str(d.fabric,200) && url(d.img)
+        && d.status in ['pending','approved','rejected']
+        && text(d.date,40) && text(d.ownerId,128) && str(d.reviewedBy,100);
+    }
+    function adminReview(d) {
+      return (d.status == 'pending' && d.reviewedBy == '')
+        || (d.status in ['approved','rejected'] && d.reviewedBy == profile().name);
+    }
+    match /designs/{id} {
+      allow read: if roles(['admin','analyst'])
+        || (role('designer') && resource.data.ownerId == request.auth.uid)
+        || (role('marketer') && resource.data.status == 'approved');
+      allow create: if validDesign(request.resource.data)
+        && request.resource.data.ownerId == request.auth.uid
+        && ((admin() && adminReview(request.resource.data))
+          || (role('designer') && request.resource.data.status == 'pending'
+            && request.resource.data.reviewedBy == ''));
+      allow update: if validDesign(request.resource.data)
+        && request.resource.data.ownerId == resource.data.ownerId
+        && request.resource.data.date == resource.data.date
+        && ((admin() && (
+            // Editing an already reviewed record preserves its original reviewer.
+            (request.resource.data.status == resource.data.status
+              && request.resource.data.reviewedBy == resource.data.reviewedBy)
+            || adminReview(request.resource.data)))
+          || (role('designer') && resource.data.ownerId == request.auth.uid
+            && resource.data.status != 'approved'
+            && request.resource.data.status == 'pending'
+            && request.resource.data.reviewedBy == ''));
+      allow delete: if admin() || (role('designer') && resource.data.ownerId == request.auth.uid);
+    }
+
+    function validMedia(d) {
+      return d.keys().hasAll(['name','url','src','date','ownerId'])
+        && d.keys().hasOnly(['name','url','src','date','ownerId'])
+        && text(d.name,200) && url(d.url) && d.url != '' && d.src in ['URL','CLOUD']
+        && text(d.date,40) && text(d.ownerId,128);
+    }
+    match /media/{id} {
+      allow read: if roles(['admin','marketer'])
+        || (roles(['designer','documenter']) && resource.data.ownerId == request.auth.uid);
+      allow create: if roles(['admin','designer','documenter','marketer'])
+        && validMedia(request.resource.data) && request.resource.data.ownerId == request.auth.uid;
+      allow update: if false;
+      allow delete: if admin() || (roles(['designer','documenter','marketer']) && resource.data.ownerId == request.auth.uid);
+    }
+
+    function validVendor(d) {
+      return d.keys().hasAll(['name','service','contact','rate'])
+        && d.keys().hasOnly(['name','service','contact','rate'])
+        && text(d.name,100) && str(d['service'],200) && str(d.contact,254) && amount(d.rate,1000000);
+    }
+    match /vendors/{id} {
+      allow read: if roles(['admin','coordinator','analyst']);
+      allow create, update: if roles(['admin','coordinator']) && validVendor(request.resource.data);
+      allow delete: if roles(['admin','coordinator']);
+    }
+    function validModel(d) {
+      return d.keys().hasAll(['name','age','guardian','height','specialty'])
+        && d.keys().hasOnly(['name','age','guardian','height','specialty'])
+        && text(d.name,100) && d.age is int && d.age >= 2 && d.age <= 14
+        && str(d.guardian,100) && str(d.height,50)
+        && d.specialty in ['Runway','Editorial','Commercial'];
+    }
+    match /models/{id} {
+      allow read: if roles(['admin','coordinator']);
+      allow create, update: if roles(['admin','coordinator']) && validModel(request.resource.data);
+      allow delete: if roles(['admin','coordinator']);
+    }
+
+    function validEvent(d) {
+      return d.keys().hasAll(['title','type','date','venue','budget','status','vendorIds','modelIds','expenses'])
+        && d.keys().hasOnly(['title','type','date','venue','budget','status','vendorIds','modelIds','expenses'])
+        && text(d.title,150) && d.type in ['Fashion Show','Photoshoot','Campaign','Pop-up Shop']
+        && str(d.date,10) && str(d.venue,200) && amount(d.budget,100000000)
+        && d.status in ['Planned','Live','Completed']
+        && d.vendorIds is list && d.vendorIds.size() <= 100
+        && d.modelIds is list && d.modelIds.size() <= 100
+        && d.expenses is list && d.expenses.size() <= 200;
+    }
+    function validExpense(x) {
+      return x is map && x.keys().hasAll(['desc','amount','entryId']) && x.keys().hasOnly(['desc','amount','entryId'])
+        && text(x.entryId,128) && text(x.desc,200) && amount(x.amount,1000000) && x.amount > 0;
+    }
+    function appendOneExpense(d) {
+      return d.expenses.size() == resource.data.expenses.size()+1
+        && validExpense(d.expenses[d.expenses.size()-1])
+        && d.expenses == resource.data.expenses.concat([d.expenses[d.expenses.size()-1]])
+        && d.diff(resource.data).affectedKeys().hasOnly(['expenses']);
+    }
+    match /events/{id} {
+      allow read: if roles(['admin','coordinator','analyst']);
+      allow create: if roles(['admin','coordinator']) && validEvent(request.resource.data)
+        && request.resource.data.expenses == [];
+      allow update: if roles(['admin','coordinator']) && validEvent(request.resource.data)
+        && (request.resource.data.expenses == resource.data.expenses || appendOneExpense(request.resource.data));
+      allow delete: if roles(['admin','coordinator']);
+    }
+
+    function validPost(d) {
+      return d.keys().hasAll(['platform','caption','when','image','status','likes','shares'])
+        && d.keys().hasOnly(['platform','caption','when','image','status','likes','shares'])
+        && d.platform in ['Instagram','Facebook','TikTok','Pinterest']
+        && text(d.caption,5000) && str(d.when,40) && url(d.image)
+        && d.status in ['draft','scheduled','published']
+        && (d.status == 'draft' || d.when != '')
+        // No social API is connected; clients may not invent engagement metrics.
+        && d.likes == 0 && d.shares == 0;
+    }
+    match /posts/{id} {
+      allow read: if roles(['admin','marketer','analyst']);
+      allow create, update: if roles(['admin','marketer']) && validPost(request.resource.data);
+      allow delete: if roles(['admin','marketer']);
+    }
+    match /activity/{id} {
+      allow read: if admin() || (active() && resource.data.userId == request.auth.uid);
+      allow create: if active()
+        && request.resource.data.keys().hasAll(['text','user','userId','date'])
+        && request.resource.data.keys().hasOnly(['text','user','userId','date'])
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.user == profile().name
+        && text(request.resource.data.text,500) && text(request.resource.data.date,40);
+      allow update, delete: if false;
+    }
+    function validProject(d) {
+      return d.keys().hasAll(['title','theme','season','team','cover','concept','archived','ownerId','createdAt'])
+        && d.keys().hasOnly(['title','theme','season','team','cover','concept','archived','ownerId','createdAt','deleting'])
+        && text(d.title,120) && text(d.theme,200) && str(d.season,80) && str(d.team,500)
+        && url(d.cover) && str(d.concept,5000) && d.archived is bool && d.get('deleting',false) is bool
+        && text(d.ownerId,128) && text(d.createdAt,40);
+    }
+    function validEntry(d) {
+      return d.keys().hasAll(['title','stage','kind','date','notes','image','link','outfit','model','order','cues','ownerId','author','createdAt','status','feedback','reviewer'])
+        && d.keys().hasOnly(['title','stage','kind','date','notes','image','link','outfit','model','order','cues','ownerId','author','createdAt','status','feedback','reviewer'])
+        && text(d.title,150) && d.stage in ['Inspiration','Boards','Sketches','Rendering','Fabric sourcing','Final collection','Ramp walk']
+        && d.kind in ['Design evidence','Production log','Interview','Storyboard','Event coverage','Runway look']
+        && d.date is string && d.date.matches('[0-9]{4}-[0-9]{2}-[0-9]{2}')
+        && text(d.notes,5000) && url(d.image) && url(d.link)
+        && str(d.outfit,150) && str(d.model,100) && str(d.cues,500)
+        && d.order is int && d.order >= 1 && d.order <= 999
+        && (d.kind != 'Runway look' || (d.stage == 'Ramp walk' && d.outfit != '' && d.model != ''))
+        && text(d.ownerId,128) && text(d.author,100) && text(d.createdAt,40)
+        && d.status in ['pending','approved','rejected'] && str(d.feedback,2000) && str(d.reviewer,100);
+    }
+    match /projects/{pid} {
+      allow read: if active();
+      allow create: if roles(['admin','designer','documenter','coordinator']) && validProject(request.resource.data)
+        && request.resource.data.ownerId == request.auth.uid && request.resource.data.archived == false
+        && request.resource.data.get('deleting',false) == false;
+      allow update: if roles(['admin','designer','documenter','coordinator']) && validProject(request.resource.data)
+        && (admin() || resource.data.ownerId == request.auth.uid)
+        && request.resource.data.ownerId == resource.data.ownerId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && ((resource.data.get('deleting',false) == false
+              && (request.resource.data.get('deleting',false) == false
+                || (admin() && request.resource.data.archived == true)))
+          || (admin() && resource.data.get('deleting',false) == true
+              && request.resource.data.get('deleting',false) == true && request.resource.data.archived == true
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['deleting','archived'])));
+      // The owner UI locks the parent, drains entries in batches, then deletes the parent.
+      // Rules cannot count subcollection documents; only the trusted owner may finalize.
+      allow delete: if admin() && resource.data.get('deleting',false) == true;
+      match /entries/{eid} {
+        function unlocked() {
+          return getAfter(/databases/$(database)/documents/projects/$(pid)).data.archived == false
+            && getAfter(/databases/$(database)/documents/projects/$(pid)).data.get('deleting',false) == false;
+        }
+        function deleting() { return get(/databases/$(database)/documents/projects/$(pid)).data.get('deleting',false) == true; }
+        function contributor() { return roles(['admin','designer','documenter','coordinator']); }
+        allow read: if active() && exists(/databases/$(database)/documents/projects/$(pid));
+        allow create: if contributor() && unlocked() && validEntry(request.resource.data)
+          && request.resource.data.ownerId == request.auth.uid && request.resource.data.author == profile().name
+          && request.resource.data.status == 'pending' && request.resource.data.feedback == '' && request.resource.data.reviewer == '';
+        allow update: if active() && unlocked() && validEntry(request.resource.data)
+          && request.resource.data.ownerId == resource.data.ownerId
+          && request.resource.data.author == resource.data.author
+          && request.resource.data.createdAt == resource.data.createdAt
+          && ((roles(['admin','faculty'])
+              && (admin() || resource.data.ownerId != request.auth.uid)
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','feedback','reviewer'])
+              && request.resource.data.reviewer == profile().name)
+            || (contributor() && (admin() || resource.data.ownerId == request.auth.uid)
+              && resource.data.status != 'approved' && request.resource.data.status == 'pending'
+              && request.resource.data.feedback == '' && request.resource.data.reviewer == ''));
+        allow delete: if (admin() && deleting())
+          || (contributor() && unlocked() && resource.data.status != 'approved'
+            && (admin() || resource.data.ownerId == request.auth.uid));
+      }
+    }
+
+    // Everything not explicitly matched is private.
+    match /{document=**} { allow read, write: if false; }
+  }
+}

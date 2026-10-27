@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Kids Wear FD Show | FD × BAJMC Collection Journeys</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="/vendor/chart.umd.js"></script>
+<script src="/vendor/firebase-services.js"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+--pink:#ff6b95;--teal:#2bb3a3;--sun:#ffb84d;--grape:#8b7cf6;--leaf:#4cc47c;
+--navy:#232946;--ink:#2b2d42;--mut:#7c8098;
+--bg:#f4f6fb;--card:#ffffff;--line:#e7eaf3;
+--sh:0 10px 30px -12px rgba(43,45,66,.14);
+--sh2:0 20px 50px -18px rgba(43,45,66,.22);
+--r:16px;--ease:cubic-bezier(.22,.8,.24,1);
+--fh:'Baloo 2',cursive;--fb:'Quicksand',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);background:var(--bg);color:var(--ink);line-height:1.55;font-size:15px}
+::selection{background:var(--pink);color:#fff}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#cfd5e6;border-radius:6px;border:2px solid var(--bg)}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;font-size:inherit}
+input,select,textarea{font-family:inherit;font-size:.92rem;color:var(--ink)}
+img{display:block;max-width:100%}
+h1,h2,h3,h4{font-family:var(--fh);line-height:1.2}
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:11px 20px;border-radius:12px;font-weight:700;font-size:.85rem;transition:transform .25s var(--ease),box-shadow .25s,opacity .25s;white-space:nowrap}
+.btn:hover{transform:translateY(-2px)}
+.btn:disabled{opacity:.55;cursor:not-allowed;transform:none!important}
+.btn-p{background:linear-gradient(120deg,var(--pink),#ff8fab);color:#fff;box-shadow:0 10px 24px -10px rgba(255,107,149,.65)}
+.btn-t{background:linear-gradient(120deg,var(--teal),#4ed0bf);color:#fff;box-shadow:0 10px 24px -10px rgba(43,179,163,.6)}
+.btn-g{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+.btn-d{background:#ffe9ee;color:#e0446c}
+.btn-grape{background:#efeaff;color:#6a58d8}
+.btn-sm{padding:7px 13px;font-size:.76rem;border-radius:10px}
+.pill{display:inline-flex;align-items:center;padding:4px 12px;border-radius:100px;font-size:.7rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.st-pending{background:#fff3d6;color:#a06a00}.st-approved{background:#ddf6e7;color:#177a44}.st-rejected{background:#ffe4e9;color:#cf3357}
+.st-planned{background:#e5e9fb;color:#4a58b8}.st-live{background:#ddf6e7;color:#177a44}.st-completed{background:#eceef5;color:#69708f}
+.st-draft{background:#eceef5;color:#69708f}.st-scheduled{background:#fff3d6;color:#a06a00}.st-published{background:#ddf6e7;color:#177a44}
+.live-dot{display:inline-flex;align-items:center;gap:.45rem;font-size:.72rem;font-weight:800;color:#177a44;background:#ddf6e7;padding:5px 13px;border-radius:100px}
+.live-dot i{width:8px;height:8px;border-radius:50%;background:#2ecc71;animation:pulseDot 1.6s infinite}
+@keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
+#login{position:fixed;inset:0;z-index:500;display:grid;grid-template-columns:1.05fr 1fr;background:#fff;overflow-y:auto}
+.login-hero{position:relative;background:linear-gradient(150deg,var(--navy) 0%,#3a2b5f 55%,#7a3b6e 100%);overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:6vh 6vw;color:#fff}
+.login-hero::before,.login-hero::after{content:'';position:absolute;border-radius:50%;filter:blur(60px);opacity:.5}
+.login-hero::before{width:420px;height:420px;background:var(--pink);top:-120px;right:-100px;animation:blob 9s ease-in-out infinite alternate}
+.login-hero::after{width:380px;height:380px;background:var(--teal);bottom:-140px;left:-80px;animation:blob 11s ease-in-out infinite alternate-reverse}
+@keyframes blob{from{transform:translate(0,0) scale(1)}to{transform:translate(50px,40px) scale(1.15)}}
+.lh-inner{position:relative;z-index:2;max-width:520px}
+.lh-brand{display:block;font-weight:700;font-size:.86rem;letter-spacing:.04em;color:#f5d8e4;margin-bottom:1.5rem}
+.lh-logo{font-family:var(--fh);font-size:clamp(2.4rem,4vw,3.6rem);font-weight:800;line-height:1.05;margin-bottom:1rem}
+.lh-logo em{font-style:normal;background:linear-gradient(120deg,#ffd166,#ff8fab);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lh-tagline{font-size:1.15rem;font-weight:700;color:#ffe0eb;margin-bottom:.65rem}
+.lh-sub{color:rgba(255,255,255,.85);font-size:1.02rem;max-width:430px;margin-bottom:2.2rem;font-weight:500}
+.lh-feats{display:grid;gap:.85rem}
+.lh-feats span{display:flex;align-items:center;gap:.8rem;font-size:.92rem;font-weight:600;color:rgba(255,255,255,.92)}
+.lh-feats i{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.12);display:grid;place-items:center;font-style:normal;flex-shrink:0}
+.login-decor{position:absolute;inset:0;z-index:1;pointer-events:none;user-select:none}
+.floaty{position:absolute;display:block;right:4%;width:clamp(32px,3vw,45px);height:clamp(32px,3vw,45px);filter:drop-shadow(0 6px 10px rgba(0,0,0,.12));animation:fashionFloat 7s ease-in-out infinite;transform-origin:center}
+.floaty-dress{top:16%}
+.floaty-bear{bottom:18%;animation-duration:8.5s;animation-delay:-3s}
+.floaty-sparkles{top:52%;animation-duration:6s;animation-delay:-1.5s}
+.floaty-hanger,.floaty-button{left:3%;right:auto;width:clamp(28px,3vw,40px);height:clamp(28px,3vw,40px);color:#ffd6e6;opacity:.65}
+.floaty-hanger{top:8%;animation-duration:9s;animation-delay:-4s}
+.floaty-button{bottom:7%;color:#ffe0a3;animation-duration:10s;animation-delay:-2s}
+.floaty svg{display:block;width:100%;height:100%}
+.login-stitch{position:absolute;inset:0;width:100%;height:100%;opacity:.16}
+.login-stitch path{fill:none;stroke:#ffd6e6;stroke-width:1.5;stroke-dasharray:5 14;vector-effect:non-scaling-stroke;animation:stitchTravel 18s linear infinite}
+.login-enter{animation:loginReveal .7s var(--ease) both;animation-delay:var(--entry-delay,0s)}
+.lh-logo em{background-size:220% 100%;animation:titleShimmer 8s ease-in-out infinite}
+.lh-feats>span{animation:loginReveal .65s var(--ease) both;animation-delay:calc(.3s + var(--feature-order,0)*.09s)}
+.lh-feats>span:nth-child(2){--feature-order:1}.lh-feats>span:nth-child(3){--feature-order:2}.lh-feats>span:nth-child(4){--feature-order:3}.lh-feats>span:nth-child(5){--feature-order:4}
+.motion-toggle{display:inline-flex;align-items:center;gap:8px;min-height:36px;margin-top:20px;color:#f8dfeb;font-size:.78rem;font-weight:600;text-decoration:underline;text-decoration-color:rgba(255,255,255,.3);text-underline-offset:4px;border-radius:6px}
+.motion-toggle:hover{text-decoration-color:currentColor}
+.motion-toggle:focus-visible{outline:2px solid #ffd166;outline-offset:4px}
+.motion-toggle svg{width:15px;height:15px;fill:currentColor}
+#login.motion-paused .floaty,#login.motion-paused .lh-logo em,#login.motion-paused .login-stitch path,#login.motion-paused .login-hero::before,#login.motion-paused .login-hero::after{animation-play-state:paused}
+#login.motion-paused .login-enter,#login.motion-paused .lh-feats>span,#login.motion-paused .login-card,#login.motion-paused .login-card form{animation:none}
+@keyframes fashionFloat{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-14px) rotate(6deg)}}
+@keyframes stitchTravel{to{stroke-dashoffset:-190}}
+@keyframes titleShimmer{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes loginReveal{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes authPanelIn{from{opacity:.3;transform:translateY(6px)}to{opacity:1;transform:none}}
+.login-panel{display:flex;align-items:center;justify-content:center;min-width:0;padding:24px 5vw;background:var(--bg)}
+.login-card{width:min(460px,100%);max-height:calc(100vh - 48px);max-height:calc(100dvh - 48px);overflow-y:auto;background:#fff;border-radius:24px;box-shadow:var(--sh2);padding:2.4rem 2.3rem;animation:fadeUp .6s var(--ease)}
+.login-mobile-brand{display:none}
+.login-card h2{font-size:1.65rem;margin-bottom:.25rem}
+.login-card form{animation:authPanelIn .28s var(--ease)}
+.login-card form>p{color:#566078;margin-bottom:1.2rem;font-weight:600;font-size:.9rem}
+.auth-tabs{display:flex;background:#f1f3fa;border-radius:14px;padding:5px;margin-bottom:1.4rem}
+.auth-tab{flex:1;padding:10px;border-radius:10px;font-weight:700;font-size:.88rem;color:var(--mut);transition:.25s}
+.auth-tab.active{background:var(--navy);color:#fff}
+.f-label{display:block;font-size:.74rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin:.85rem 0 .35rem}
+.f-in{width:100%;padding:13px 16px;border-radius:12px;border:1.5px solid var(--line);outline:none;transition:border-color .25s,box-shadow .25s;background:#fbfcfe}
+.f-in:focus{border-color:var(--pink);box-shadow:0 0 0 4px rgba(255,107,149,.13)}
+.login-card .f-label{color:#566078}
+.login-card select.f-in{max-width:none}
+.login-card .auth-tab{color:#566078}
+.login-card .auth-tab.active{color:#fff}
+.login-card .f-in:focus{border-color:#6652c7;box-shadow:0 0 0 3px rgba(102,82,199,.16)}
+.login-card button:focus-visible{outline:3px solid #6652c7;outline-offset:3px}
+.login-card .btn-p{background:linear-gradient(120deg,#b62d61,#a82d67);box-shadow:0 10px 24px -12px rgba(182,45,97,.4)}
+.password-field{position:relative}
+.password-field .f-in{padding-right:74px}
+.password-toggle{position:absolute;top:50%;right:8px;transform:translateY(-50%);min-width:56px;min-height:40px;padding:6px;border-radius:8px;color:#51419c;font-size:.8rem;font-weight:700}
+.password-toggle:hover{background:#efeaff}
+.login-card .approval-note{padding:12px 14px;background:#f1effb;border:1px solid #e3def7;border-radius:12px;color:#514477;font-size:.8rem;margin:1rem 0 0}
+.login-msg{font-size:.82rem;font-weight:600;margin-top:.8rem;min-height:1.2em;color:#b3274a;overflow-wrap:anywhere}
+.login-msg.ok{color:#17653c}
+.login-msg.info{color:#4d5872}
+.full-w{width:100%;justify-content:center;padding:14px;margin-top:1.1rem}
+.check-row{display:flex;align-items:flex-start;gap:.6rem;margin-top:1rem;font-size:.82rem;font-weight:600}
+.check-row input{accent-color:var(--pink);width:17px;height:17px;margin-top:2px;flex-shrink:0}
+.forgot-link{display:block;text-align:right;font-size:.78rem;font-weight:700;color:#5c47b6;cursor:pointer;margin-top:.5rem;background:none;min-height:36px}
+.forgot-link:hover{text-decoration:underline}
+.forgot-link:disabled{opacity:.65;cursor:wait}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+.hidden{display:none!important}
+#app{display:none;min-height:100vh}
+#app.on{display:grid;grid-template-columns:256px 1fr}
+.sidebar{background:var(--navy);color:#cdd3ea;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;z-index:60}
+.sb-brand{display:flex;align-items:center;gap:.8rem;padding:22px 22px 18px;border-bottom:1px solid rgba(255,255,255,.07)}
+.sb-badge{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--pink),var(--sun));display:grid;place-items:center;font-size:1.3rem;flex-shrink:0}
+.sb-brand b{font-family:var(--fh);color:#fff;font-size:1.12rem;line-height:1.1;display:block}
+.sb-brand small{font-size:.66rem;color:#8f96bd;letter-spacing:.08em;text-transform:uppercase}
+.nav-list{flex:1;overflow-y:auto;padding:14px 14px;display:grid;gap:4px;align-content:start}
+.nav-item{display:flex;align-items:center;gap:.9rem;padding:12px 14px;border-radius:12px;font-weight:600;font-size:.9rem;color:#aab1d6;transition:.25s var(--ease);text-align:left;width:100%}
+.nav-item i{font-style:normal;font-size:1.15rem;width:24px;text-align:center}
+.nav-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav-item.active{background:linear-gradient(120deg,var(--pink),#ff8fab);color:#fff;box-shadow:0 10px 22px -10px rgba(255,107,149,.7)}
+.sb-foot{padding:16px 22px;border-top:1px solid rgba(255,255,255,.07);font-size:.68rem;color:#7d84ab}
+.main{min-width:0;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.86);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:1rem;padding:14px 28px}
+.hamburger{display:none;font-size:1.3rem;width:40px;height:40px;border-radius:10px;border:1.5px solid var(--line)}
+.tb-title{font-family:var(--fh);font-size:1.25rem;font-weight:700}
+.tb-spacer{flex:1}
+.user-chip{display:flex;align-items:center;gap:.7rem;background:#fff;border:1.5px solid var(--line);padding:6px 8px 6px 6px;border-radius:100px}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--grape),var(--pink));color:#fff;display:grid;place-items:center;font-weight:800;font-size:.78rem;flex-shrink:0}
+.uc-name{font-weight:700;font-size:.83rem;line-height:1.1}
+.uc-role{font-size:.64rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.logout-btn{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;transition:.25s}
+.logout-btn:hover{background:#ffe9ee;color:#e0446c}
+.content{padding:28px;max-width:1340px;width:100%;margin-inline:auto}
+.page{display:none}
+.page.show{display:block;animation:fadeUp .4s var(--ease)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem}
+.kpi{background:var(--card);border-radius:var(--r);padding:1.15rem 1.3rem;box-shadow:var(--sh);display:flex;gap:1rem;align-items:center;border:1px solid var(--line);transition:transform .3s var(--ease)}
+.kpi:hover{transform:translateY(-4px)}
+.kpi-ic{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:1.3rem;flex-shrink:0}
+.kpi b{font-family:var(--fh);font-size:1.5rem;display:block;line-height:1.1}
+.kpi span{font-size:.72rem;color:var(--mut);font-weight:600;text-transform:uppercase}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);padding:1.5rem}
+.panel h3{font-size:1.1rem;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.grid-2{display:grid;grid-template-columns:1.5fr 1fr;gap:1.2rem;margin-top:1.2rem}
+.toolbar{display:flex;gap:.8rem;flex-wrap:wrap;align-items:center;margin-bottom:1.2rem}
+.toolbar .f-in{max-width:240px}
+select.f-in{max-width:180px}
+.sec-gap{height:1.2rem}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1.2rem}
+.d-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);transition:transform .3s var(--ease),box-shadow .3s}
+.d-card:hover{transform:translateY(-5px);box-shadow:var(--sh2)}
+.d-media{position:relative;aspect-ratio:1/.82;background:linear-gradient(135deg,#ffe3ec,#e3f6ff)}
+.d-media .fall{position:absolute;inset:0;display:grid;place-items:center;font-size:3.4rem}
+.d-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.d-media .pill{position:absolute;top:10px;left:10px;box-shadow:0 4px 12px rgba(0,0,0,.15);z-index:2}
+.d-lock{position:absolute;top:10px;right:10px;z-index:2;background:rgba(35,41,70,.75);color:#ffd166;padding:4px 10px;border-radius:100px;font-size:.68rem;font-weight:700;backdrop-filter:blur(4px)}
+.d-body{padding:1rem 1.1rem 1.15rem}
+.d-body h4{font-size:1.02rem;margin-bottom:.3rem}
+.meta-row{display:flex;flex-wrap:wrap;gap:.35rem;margin:.45rem 0}
+.mchip{background:#f1f3fa;border-radius:8px;padding:3px 9px;font-size:.68rem;font-weight:700;color:var(--mut)}
+.d-foot{display:flex;align-items:center;justify-content:space-between;margin-top:.8rem;gap:.5rem;flex-wrap:wrap}
+.price-tag{font-family:var(--fh);font-weight:700;font-size:1.05rem;color:var(--teal)}
+.vendor-tag{font-size:.7rem;color:var(--mut);font-weight:600}
+.act-row{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.8rem;align-items:center}
+.icon-act{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font-size:.85rem;border:1.5px solid var(--line);transition:.2s;background:#fff}
+.icon-act.ok:hover{background:#ddf6e7;border-color:#9adfb6}
+.icon-act.no:hover{background:#ffe4e9;border-color:#ffb3c2}
+.icon-act.ed:hover{background:#e5e9fb;border-color:#b9c3f2}
+.icon-act.del:hover{background:#ffe4e9;border-color:#ffb3c2;color:#cf3357}
+.tbl-wrap{overflow-x:auto}
+table.tbl{width:100%;border-collapse:collapse;font-size:.87rem}
+.tbl th{text-align:left;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);padding:.7rem .8rem;border-bottom:2px solid var(--line)}
+.tbl td{padding:.75rem .8rem;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl tr:hover td{background:#fafbff}
+.role-badge{padding:4px 11px;border-radius:100px;font-size:.68rem;font-weight:700;color:#fff;white-space:nowrap}
+.ev-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);padding:1.3rem 1.4rem;margin-bottom:1rem}
+.ev-head{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:flex-start}
+.ev-head h4{font-size:1.08rem}
+.ev-meta{color:var(--mut);font-size:.8rem;font-weight:600;display:flex;gap:1rem;flex-wrap:wrap;margin-top:.25rem;align-items:center}
+.budget-bar{height:10px;border-radius:6px;background:#eef1f8;overflow:hidden;margin:.5rem 0 .3rem}
+.budget-bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--teal),var(--leaf));transition:width .8s var(--ease)}
+.budget-bar i.over{background:linear-gradient(90deg,#ff6b6b,#ff9f68)}
+.budget-txt{font-size:.76rem;color:var(--mut);font-weight:700}
+.team-chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.7rem}
+.tchip{background:#f1f3fa;border-radius:100px;padding:4px 11px;font-size:.72rem;font-weight:700}
+.exp-list{margin-top:.8rem;border-top:1px dashed var(--line);padding-top:.7rem;display:none}
+.ev-card.open .exp-list{display:block}
+.exp-row{display:flex;justify-content:space-between;font-size:.83rem;padding:.3rem 0;font-weight:600}
+.exp-add{display:flex;gap:.5rem;margin-top:.6rem;flex-wrap:wrap}
+.exp-add .f-in{max-width:200px;padding:9px 12px}
+.tabs{display:flex;gap:.5rem;margin-bottom:1.2rem;background:#fff;border:1.5px solid var(--line);padding:5px;border-radius:14px;width:max-content;flex-wrap:wrap}
+.tab{padding:9px 20px;border-radius:10px;font-weight:700;font-size:.85rem;color:var(--mut);transition:.25s}
+.tab.active{background:var(--navy);color:#fff}
+.post-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);padding:1.1rem 1.2rem;display:flex;gap:1rem;align-items:flex-start;margin-bottom:.9rem;transition:transform .25s var(--ease)}
+.post-card:hover{transform:translateY(-3px)}
+.post-thumb{width:64px;height:64px;border-radius:12px;object-fit:cover;background:linear-gradient(135deg,#ffe3ec,#e3f6ff);display:grid;place-items:center;font-size:1.6rem;flex-shrink:0}
+.post-cap{font-size:.9rem;font-weight:600;margin:.25rem 0 .4rem}
+.eng{display:flex;gap:1rem;font-size:.76rem;color:var(--mut);font-weight:700}
+.platform-ic{font-size:1.1rem}
+.ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.2rem}
+.swatches{display:flex;gap:.7rem;margin-top:1rem;flex-wrap:wrap}
+.swatch{flex:1;min-width:74px;height:86px;border-radius:14px;display:flex;align-items:flex-end;justify-content:center;padding:.5rem;cursor:pointer;transition:transform .25s var(--ease);box-shadow:var(--sh)}
+.swatch:hover{transform:translateY(-6px) scale(1.03)}
+.swatch span{background:rgba(255,255,255,.85);color:#222;font-size:.68rem;font-weight:800;padding:2px 8px;border-radius:100px;font-family:monospace}
+.ai-out{background:#f8f9fd;border:1.5px dashed #d6dbea;border-radius:12px;padding:.9rem 1rem;margin-top:.8rem;font-size:.87rem;display:grid;gap:.6rem}
+.cap-var{background:#fff;border:1px solid var(--line);border-radius:10px;padding:.7rem .9rem;font-weight:600}
+.insight-li{display:flex;gap:.6rem;font-size:.88rem;padding:.45rem 0;border-bottom:1px dashed var(--line);font-weight:600}
+.insight-li:last-child{border:none}
+.rtype-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-bottom:1.2rem}
+.rtype{background:var(--card);border:2px solid var(--line);border-radius:var(--r);padding:1.2rem;text-align:left;transition:.25s var(--ease)}
+.rtype:hover{border-color:#c9d0e4;transform:translateY(-3px)}
+.rtype.sel{border-color:var(--pink);background:#fff5f8}
+.rtype .ric{font-size:1.7rem;margin-bottom:.5rem}
+.rtype b{font-family:var(--fh);font-size:1rem;display:block}
+.rtype small{color:var(--mut);font-weight:600}
+#reportSheet{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:2.4rem;box-shadow:var(--sh);display:none}
+#reportSheet.show{display:block;animation:fadeUp .4s var(--ease)}
+.rpt-head{display:flex;justify-content:space-between;gap:1rem;border-bottom:3px solid var(--navy);padding-bottom:1rem;margin-bottom:1.4rem;flex-wrap:wrap}
+.rpt-head h2{font-size:1.5rem;color:var(--navy)}
+.rpt-head p{color:var(--mut);font-size:.82rem;font-weight:600}
+.rpt-summary{background:#f6f7fc;border-left:4px solid var(--pink);padding:1rem 1.2rem;border-radius:0 12px 12px 0;font-size:.9rem;font-weight:600;margin-bottom:1.4rem}
+.rpt-chips{display:flex;gap:.8rem;flex-wrap:wrap;margin-bottom:1.6rem}
+.rpt-chip{background:var(--navy);color:#fff;border-radius:12px;padding:.7rem 1.1rem;min-width:120px}
+.rpt-chip b{font-family:var(--fh);font-size:1.25rem;display:block}
+.rpt-chip span{font-size:.66rem;opacity:.75;letter-spacing:.05em;text-transform:uppercase}
+.rpt-sec h3{color:var(--navy);font-size:1.05rem;margin:1.4rem 0 .7rem}
+#modalWrap{position:fixed;inset:0;z-index:400;display:none;align-items:center;justify-content:center;padding:1rem}
+#modalWrap.show{display:flex}
+.modal-bg{position:absolute;inset:0;background:rgba(35,41,70,.55);backdrop-filter:blur(4px);animation:fadeIn .25s}
+@keyframes fadeIn{from{opacity:0}}
+.modal{position:relative;width:min(560px,100%);max-height:90vh;overflow-y:auto;background:#fff;border-radius:20px;box-shadow:var(--sh2);animation:popIn .35s var(--ease)}
+@keyframes popIn{from{opacity:0;transform:scale(.94) translateY(16px)}}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:1.3rem 1.6rem;border-bottom:1px solid var(--line)}
+.modal-head h3{font-size:1.15rem}
+.modal-body{padding:1.4rem 1.6rem}
+.modal-foot{padding:1.1rem 1.6rem 1.5rem;display:flex;gap:.7rem;justify-content:flex-end}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.2rem 1rem}
+.form-grid .full{grid-column:1/-1}
+.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;background:#f8f9fd;border:1px solid var(--line);border-radius:12px;padding:.9rem 1rem}
+.check-grid label{display:flex;align-items:center;gap:.55rem;font-size:.85rem;font-weight:600}
+.check-grid input{accent-color:var(--pink);width:16px;height:16px}
+.drop-zone{border:2.5px dashed #c9d0e4;border-radius:var(--r);padding:2.4rem;text-align:center;color:var(--mut);font-weight:700;cursor:pointer;transition:.3s;background:#fff}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--pink);background:#fff5f8;color:var(--pink)}
+.media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem}
+.m-item{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);aspect-ratio:1;background:linear-gradient(135deg,#ffe3ec,#e3f6ff);display:grid;place-items:center;font-size:2.2rem}
+.m-item img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.m-actions{position:absolute;bottom:8px;left:8px;right:8px;display:flex;gap:.4rem;justify-content:center;opacity:0;transition:.25s;z-index:2}
+.m-item:hover .m-actions{opacity:1}
+.src-badge{position:absolute;top:8px;left:8px;z-index:2;background:rgba(35,41,70,.8);color:#fff;font-size:.62rem;font-weight:800;letter-spacing:.06em;padding:3px 9px;border-radius:100px}
+.page-help{background:#f6f8fb;border:1px solid var(--line);color:#4b5670;border-radius:12px;font-size:.85rem;line-height:1.6;margin-bottom:1.2rem}
+.page-help summary{padding:.7rem 1rem;cursor:pointer;font-weight:700}
+.page-help summary:focus-visible{outline:2px solid var(--teal);outline-offset:3px;border-radius:10px}
+.page-help p{padding:0 1rem .85rem;margin:0;max-width:85ch}
+.planner-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:.7rem;margin-bottom:1rem}
+.planner-stat{background:#f6f8fb;border:1px solid var(--line);border-radius:12px;padding:1rem}
+.planner-stat b{display:block;font-size:1.7rem;color:var(--navy)}
+.planner-stat span{font-size:.78rem;font-weight:700;color:#4b5670}
+.planner-note{font-size:.8rem;color:#4b5670;line-height:1.6;margin:.6rem 0 1rem}
+.matrix td,.matrix th{text-align:center}
+.matrix td:first-child,.matrix th:first-child{text-align:left;font-weight:700}
+#toast{position:fixed;bottom:26px;left:50%;transform:translate(-50%,150%);z-index:600;background:var(--navy);color:#fff;padding:14px 26px;border-radius:100px;font-weight:700;font-size:.88rem;box-shadow:var(--sh2);transition:transform .5s var(--ease);max-width:92vw}
+#toast{opacity:0;visibility:hidden;pointer-events:none}
+#toast.show{transform:translate(-50%,0);opacity:1;visibility:visible}
+.empty-state{text-align:center;color:var(--mut);padding:3rem 1rem;font-weight:600}
+.empty-state .big{font-size:3rem;margin-bottom:.6rem}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:1020px){
+#app.on{grid-template-columns:1fr}
+.sidebar{position:fixed;left:-270px;width:256px;transition:left .4s var(--ease);box-shadow:var(--sh2)}
+.sidebar.open{left:0}
+.hamburger{display:grid;place-items:center}
+.grid-2{grid-template-columns:1fr}
+#login{grid-template-columns:1fr}
+.login-hero{display:none}
+.login-panel{padding:20px 16px}
+.login-card{max-height:calc(100vh - 40px);max-height:calc(100dvh - 40px);padding:1.6rem}
+.login-mobile-brand{display:block;margin-bottom:1.3rem;padding-bottom:1.1rem;border-bottom:1px solid var(--line)}
+.login-mobile-brand b{display:block;font-family:var(--fh);font-size:1.35rem;color:var(--navy)}
+.login-mobile-brand small{color:#566078;font-weight:600}
+}
+@media(prefers-reduced-motion:reduce){
+#login *,#login *::before,#login *::after{animation:none!important;transition:none!important}
+.motion-toggle{display:none}
+}
+@media print{
+body *{visibility:hidden;animation:none!important;transition:none!important}
+#toast{display:none!important}
+#reportSheet,#reportSheet *{visibility:visible}
+#reportSheet{position:absolute;left:0;top:0;width:100%;border:none;box-shadow:none}
+}
+</style>
+<script src="/firebase-config.js"></script>
+<script src="/integrations-config.js"></script>
+<link rel="stylesheet" href="/integrations.css">
+</head>
+<body>
+
+<div id="login">
+  <div class="login-hero">
+    <div class="login-decor" aria-hidden="true">
+      <svg class="login-stitch" viewBox="0 0 600 900" preserveAspectRatio="none" focusable="false"><path d="M-30 70 C160 10 420 140 560 65 S590 350 550 520 S610 820 650 860 M-20 810 C70 750 150 870 310 850"/></svg>
+      <span class="floaty floaty-dress"><svg viewBox="0 0 48 48" focusable="false"><path d="M16 4l8 4 8-4 2 9-6 7 13 22Q24 49 7 42l13-22-6-7z" fill="#63baff"/><path d="M16 4l8 4 8-4-2 7H18z" fill="#2885d2"/><path d="M20 19h8l2 5H18z" fill="#a1dcff"/><path d="M19 25l-5 17m10-17v19m5-19l5 17" fill="none" stroke="#3299e7" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+      <span class="floaty floaty-bear"><svg viewBox="0 0 48 48" focusable="false"><g fill="#c98a51"><circle cx="11" cy="10" r="7"/><circle cx="37" cy="10" r="7"/><ellipse cx="24" cy="32" rx="13" ry="14"/><ellipse cx="9" cy="29" rx="6" ry="9" transform="rotate(25 9 29)"/><ellipse cx="39" cy="29" rx="6" ry="9" transform="rotate(-25 39 29)"/></g><g fill="#ecc298"><circle cx="11" cy="10" r="3.5"/><circle cx="37" cy="10" r="3.5"/><ellipse cx="24" cy="33" rx="8" ry="10"/></g><circle cx="24" cy="17" r="14" fill="#dda169"/><ellipse cx="24" cy="22" rx="8" ry="6" fill="#f3d5ac"/><g fill="#50342b"><circle cx="18" cy="16" r="1.7"/><circle cx="30" cy="16" r="1.7"/><ellipse cx="24" cy="20" rx="2.6" ry="1.8"/></g><path d="M24 22v2m-3 0q3 3 6 0" fill="none" stroke="#50342b" stroke-width="1.2" stroke-linecap="round"/><g fill="#b87844"><ellipse cx="13" cy="41" rx="7" ry="6"/><ellipse cx="35" cy="41" rx="7" ry="6"/></g><path d="M24 29l-6-3v7l6-3 6 3v-7z" fill="#f690a9"/></svg></span>
+      <span class="floaty floaty-sparkles"><svg viewBox="0 0 48 48" focusable="false"><path d="M29 6l5 13 13 5-13 5-5 13-5-13-13-5 13-5z" fill="#ffd166"/><path d="M10 2l2.5 7.5L20 12l-7.5 2.5L10 22l-2.5-7.5L0 12l7.5-2.5z" fill="#ffe5a3"/><path d="M9 31l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" fill="#ffb5ca"/></svg></span>
+      <span class="floaty floaty-hanger"><svg viewBox="0 0 48 48" fill="none" focusable="false"><path d="M20 14a5 5 0 1 1 8 4c-3 2-4 3-4 6L5 34a3 3 0 0 0 2 5h34a3 3 0 0 0 2-5L24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span class="floaty floaty-button"><svg viewBox="0 0 48 48" fill="none" focusable="false"><circle cx="24" cy="24" r="19" stroke="currentColor" stroke-width="2.5"/><circle cx="24" cy="24" r="14" stroke="currentColor" stroke-width="1"/><g fill="currentColor"><circle cx="19" cy="19" r="2"/><circle cx="29" cy="19" r="2"/><circle cx="19" cy="29" r="2"/><circle cx="29" cy="29" r="2"/></g></svg></span>
+    </div>
+    <div class="lh-inner">
+      <span class="lh-brand login-enter">KidCouture Studio · FD × BAJMC</span>
+      <h1 class="lh-logo login-enter" style="--entry-delay:.08s">Kids Wear<br/><em>FD Show.</em></h1>
+      <p class="lh-tagline login-enter" style="--entry-delay:.16s">From inspiration to runway.</p>
+      <p class="lh-sub login-enter" style="--entry-delay:.24s">A shared workspace for Fashion Design and BAJMC students to develop collections, document the creative journey and showcase the final show.</p>
+      <div class="lh-feats">
+        <span><i aria-hidden="true">01</i> Collection journeys, from concept to creation</span>
+        <span><i aria-hidden="true">02</i> Design boards, sketches and fabric stories</span>
+        <span><i aria-hidden="true">03</i> BAJMC documentation of the design process</span>
+        <span><i aria-hidden="true">04</i> Faculty feedback and creative reviews</span>
+        <span><i aria-hidden="true">05</i> Runway looks and collection portfolios</span>
+      </div>
+      <button type="button" class="motion-toggle" id="loginMotionButton" aria-pressed="false" onclick="toggleLoginMotion()"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 2h3v12H4zM9 2h3v12H9z"/></svg><span>Pause animations</span></button>
+    </div>
+  </div>
+  <div class="login-panel">
+    <div class="login-card">
+      <div class="login-mobile-brand"><b>Kids Wear FD Show</b><small>KidCouture Studio · FD × BAJMC</small></div>
+      <div class="auth-tabs" role="group" aria-label="Account access">
+        <button type="button" class="auth-tab active" id="tabIn" aria-pressed="true" aria-controls="formIn" onclick="switchAuth('in')">Sign In</button>
+        <button type="button" class="auth-tab" id="tabUp" aria-pressed="false" aria-controls="formUp" onclick="switchAuth('up')">Register</button>
+      </div>
+
+      <form id="formIn" aria-labelledby="signInTitle">
+        <h2 id="signInTitle">Welcome back</h2>
+        <p>Sign in to continue your collection journey.</p>
+        <label class="f-label" for="liEmail">Email</label>
+        <input class="f-in" id="liEmail" name="email" type="email" autocomplete="username" autocapitalize="none" spellcheck="false" required/>
+        <label class="f-label" for="liPass">Password</label>
+        <div class="password-field">
+          <input class="f-in" id="liPass" name="password" type="password" autocomplete="current-password" required/>
+          <button type="button" class="password-toggle" data-password="liPass" aria-controls="liPass" aria-label="Show password" aria-pressed="false" onclick="togglePassword('liPass')">Show</button>
+        </div>
+        <button type="button" id="resetPasswordBtn" class="forgot-link" onclick="resetPassword()">Forgot password?</button>
+        <div class="login-msg" id="msgIn" role="status" aria-live="polite" aria-atomic="true"></div>
+        <button class="btn btn-p full-w" type="submit">Sign In →</button>
+      </form>
+
+      <form id="formUp" class="hidden" aria-labelledby="signUpTitle">
+        <h2 id="signUpTitle">Join the creative team</h2>
+        <p>Enter your details, choose your role and start creating.</p>
+        <label class="f-label" for="ruName">Full name</label>
+        <input class="f-in" id="ruName" name="name" maxlength="100" autocomplete="name" required/>
+        <label class="f-label" for="ruEmail">Email</label>
+        <input class="f-in" id="ruEmail" name="email" type="email" autocomplete="username" autocapitalize="none" spellcheck="false" required/>
+        <label class="f-label" for="ruPass">Password <small>(at least 6 characters)</small></label>
+        <div class="password-field">
+          <input class="f-in" id="ruPass" name="password" type="password" minlength="6" autocomplete="new-password" required/>
+          <button type="button" class="password-toggle" data-password="ruPass" aria-controls="ruPass" aria-label="Show password" aria-pressed="false" onclick="togglePassword('ruPass')">Show</button>
+        </div>
+        <div id="studentRegistrationFields">
+        <label class="f-label" for="ruRole">Your role</label>
+        <select class="f-in" id="ruRole" name="role" aria-describedby="approvalNotice">
+          <option value="documenter">BAJMC Documenter</option><option value="designer">Fashion Designer</option><option value="faculty">Faculty Reviewer</option><option value="coordinator">Event Coordinator</option><option value="marketer">Marketing Manager</option><option value="analyst">Analyst</option>
+        </select>
+        <p class="approval-note" id="approvalNotice"><b>Start immediately after registration.</b> Choose your role and enter immediately. No class code or administrator approval is required. Your role determines the tools you see; you can change it in My Account.</p>
+        </div>
+        <p class="approval-note hidden" id="ownerRegistrationNotice">This is the configured owner email. Verify ownership of this address to activate administrator access.</p>
+        <div class="login-msg" id="msgUp" role="status" aria-live="polite" aria-atomic="true"></div>
+        <button class="btn btn-p full-w" type="submit">Create account</button>
+      </form>
+      <div id="verifyPanel" class="hidden" aria-labelledby="verifyTitle">
+        <h2 id="verifyTitle">Check your inbox</h2>
+        <p class="approval-note">Verify <strong id="verifyEmail"></strong> using the link in your email, then return here. Your role opens automatically after verification.</p>
+        <div class="login-msg info" id="verifyMessage" role="status" aria-live="polite" aria-atomic="true"></div>
+        <button type="button" class="btn btn-p full-w" id="verifyRefresh" onclick="refreshEmailVerification()">I've verified my email</button>
+        <button type="button" class="btn btn-g full-w" style="margin-top:12px" id="verifyResend" onclick="resendVerificationEmail()">Resend verification email</button>
+        <button type="button" class="forgot-link" onclick="logout()">Use a different account</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-brand">
+      <div class="sb-badge">👶</div>
+      <div><b id="studioBrand">KidCouture</b><small id="sbTag">FD × BAJMC</small></div>
+    </div>
+    <nav class="nav-list" id="navList"></nav>
+    <div class="sb-foot">© 2026 KidCouture Studio<br/>Firebase · Firestore · Spark edition</div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="hamburger" id="hamBtn">☰</button>
+      <div class="tb-title" id="tbTitle">Dashboard</div>
+      <span class="live-dot"><i></i>LIVE SYNC</span>
+      <div class="tb-spacer"></div>
+      <div class="user-chip">
+        <div class="avatar" id="uAvatar">·</div>
+        <div><div class="uc-name" id="uName">—</div><div class="uc-role" id="uRole">—</div></div>
+        <button class="logout-btn" onclick="logout()" title="Sign out">⏻</button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <section class="page" id="page-dashboard">
+        <div class="kpis" id="dashKpis"></div>
+        <div class="panel hidden" id="creativeOverview" style="margin-bottom:1.2rem"></div>
+        <div class="grid-2" id="designDashboardCharts">
+          <div class="panel"><h3>📈 Designs added — last 6 months</h3><div style="height:280px"><canvas id="cMonths"></canvas></div></div>
+          <div class="panel"><h3>🧩 Category mix</h3><div style="height:280px"><canvas id="cCats"></canvas></div></div>
+        </div>
+        <div class="panel" style="margin-top:1.2rem"><h3>🕒 Recent activity <small style="font-family:var(--fb);color:var(--mut);font-weight:600">(permitted records, live)</small></h3><div id="actFeed"></div></div>
+      </section>
+
+      <section class="page" id="page-collections">
+        <div class="toolbar">
+          <input class="f-in" id="cq" placeholder="🔍 Search designs…" oninput="colState.q=this.value;renderCollections()"/>
+          <select class="f-in" id="cst" onchange="colState.st=this.value;renderCollections()">
+            <option value="">All statuses</option><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option>
+          </select>
+          <select class="f-in" id="ccat" onchange="colState.cat=this.value;renderCollections()">
+            <option value="">All categories</option><option>Casual</option><option>Party</option><option>School</option><option>Seasonal</option><option>Accessories</option>
+          </select>
+          <span style="flex:1"></span>
+          <button class="btn btn-p" onclick="openDesignModal()">＋ New Design</button>
+        </div>
+        <div class="cards-grid" id="designGrid"></div>
+      </section>
+
+      <section class="page" id="page-media">
+        <details class="page-help" id="clBanner"><summary>Upload and save an image</summary><p>Select Upload image, choose your file, then select Save image to library. You can also paste an existing HTTPS image link. Uploads are publicly accessible through their Cloudinary link; use only images approved for sharing. Removing a record here does not delete the original file.</p></details>
+        <form id="mediaUrlForm" class="panel">
+          <label class="f-label" for="mediaName">Image name</label><input class="f-in" id="mediaName" required maxlength="200"/>
+          <label class="f-label" for="mediaUrl">Image URL — paste a link or upload below</label><input class="f-in" id="mediaUrl" data-cloud-image type="url" required maxlength="2048" placeholder="Upload an image or paste https://…"/>
+          <button class="btn btn-t" type="submit" style="margin-top:1rem">Save image to library</button>
+        </form>
+        <div class="sec-gap"></div>
+        <div class="media-grid" id="mediaGrid"></div>
+      </section>
+
+      <section class="page" id="page-events">
+        <div class="kpis" id="evKpis"></div>
+        <div class="sec-gap"></div>
+        <div class="tabs">
+          <button class="tab active" data-et="events" onclick="evTab('events',this)">🎪 Events</button>
+          <button class="tab" data-et="vendors" onclick="evTab('vendors',this)">🚚 Op Vendors</button>
+          <button class="tab" data-et="models" onclick="evTab('models',this)">🧒 Models</button>
+        </div>
+        <div id="evPane"></div>
+      </section>
+
+      <section class="page" id="page-marketing">
+<details class="page-help"><summary>Plan content here; publish on your social platform</summary><p>Save a draft or choose an intended posting date. Publish the content on the selected platform yourself, then select Mark published externally. Planned dates are for your records. This planner does not publish automatically or collect live engagement statistics.</p></details>
+        <div class="grid-2" style="margin-top:0">
+          <div class="panel">
+            <h3>✍️ <span id="mcHead">Create social post</span></h3>
+            <form id="postForm" >
+              <div class="form-grid">
+                <div><label class="f-label">Platform</label>
+                  <select class="f-in" name="platform"><option>Instagram</option><option>Facebook</option><option>TikTok</option><option>Pinterest</option></select></div>
+                <div><label class="f-label">Planned date & time</label><input class="f-in" type="datetime-local" name="when"/></div>
+                <div class="full"><label class="f-label">Image URL <small>(optional)</small></label><input class="f-in" name="image" data-cloud-image type="url" maxlength="2048" placeholder="https://…"/></div>
+                <div class="full"><label class="f-label">Caption</label>
+                  <textarea class="f-in" name="caption" rows="3" required></textarea></div>
+              </div>
+              <div style="display:flex;gap:.7rem;margin-top:1rem;flex-wrap:wrap">
+                <button class="btn btn-t" type="submit" id="mcSave">💾 Save Post</button>
+                <button class="btn btn-grape" type="button" onclick="aiCaptionIntoComposer()">Open caption writer</button>
+                <button class="btn btn-g" type="button" id="mcCancel" onclick="resetComposer()" style="display:none">Cancel edit</button>
+              </div>
+            </form>
+          </div>
+          <div class="panel"><h3>📣 Content overview</h3><div id="mktSnapshot"></div></div>
+        </div>
+        <div class="sec-gap"></div>
+        <div class="toolbar">
+          <select class="f-in" id="pfFilter" onchange="renderPosts()"><option value="">All platforms</option><option>Instagram</option><option>Facebook</option><option>TikTok</option><option>Pinterest</option></select>
+          <select class="f-in" id="psFilter" onchange="renderPosts()"><option value="">All statuses</option><option value="draft">Draft</option><option value="scheduled">Planned (manual)</option><option value="published">Published</option></select>
+        </div>
+        <div id="postsList"></div>
+      </section>
+
+      <section class="page" id="page-ai">
+<details class="page-help"><summary>Captions, color palettes and catalog insights</summary><p>Generate captions with Gemini or choose local templates. Only the caption details you enter are sent for AI generation. Palettes use color formulas, and catalog insights summarise saved designs. Review every caption before sharing.</p></details>
+        <div class="ai-grid">
+          <div class="panel">
+            <h3>🎨 Color Palette Suggester</h3>
+            <div class="form-grid">
+              <div><label class="f-label">Season</label><select class="f-in" id="palSeason"><option>Spring</option><option>Summer</option><option>Autumn</option><option>Winter</option></select></div>
+              <div><label class="f-label">Mood</label><select class="f-in" id="palMood"><option>Playful</option><option>Elegant</option><option>Eco-Natural</option><option>Bold</option></select></div>
+            </div>
+            <button class="btn btn-p btn-sm" style="margin-top:1rem" onclick="genPalette()">✨ Generate Palette</button>
+            <div class="swatches" id="swatches"></div>
+            <div class="ai-out" id="palNote"></div>
+          </div>
+          <div class="panel">
+            <h3>💬 Caption Writer</h3>
+            <div class="form-grid">
+              <div><label class="f-label" for="capName">Outfit / collection name</label><input class="f-in" id="capName" maxlength="150" placeholder="Twirl Dress"/></div>
+              <div><label class="f-label">Category</label><select class="f-in" id="capCat"><option>Casual</option><option>Party</option><option>School</option><option>Seasonal</option><option>Accessories</option></select></div>
+              <div class="full"><label class="f-label">Tone</label><select class="f-in" id="capTone"><option>Playful</option><option>Elegant</option><option>Eco</option></select></div>
+              <div class="full"><label class="f-label" for="capContext">Design story <small>(optional)</small></label><textarea class="f-in" id="capContext" maxlength="1000" rows="3" placeholder="Theme, design stage and details to mention. Leave out children's personal information."></textarea></div>
+            </div>
+            <div class="caption-actions"><button type="button" class="btn btn-grape btn-sm" id="generateAiCaptions" onclick="generateAiCaptions()">Generate with Gemini</button><button type="button" class="btn btn-g btn-sm" id="templateCaptions" onclick="genCaptions()">Use templates</button></div>
+            <p class="caption-status" id="captionStatus" role="status" aria-live="polite"></p>
+            <div class="ai-out" id="capOut" aria-live="polite"></div>
+          </div>
+          <div class="panel" id="catalogInsightsPanel" style="grid-column:1/-1">
+            <h3>📊 Catalog Insights <small style="font-family:var(--fb);font-weight:600;color:var(--mut)">— based on saved designs</small></h3>
+            <div class="grid-2" style="margin:0">
+              <div style="height:260px"><canvas id="trendCat"></canvas></div>
+              <div style="height:260px"><canvas id="trendPrice"></canvas></div>
+            </div>
+            <div class="ai-out" id="trendInsights" style="margin-top:1.2rem"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-reports">
+        <div class="rtype-grid" id="rtypeGrid"></div>
+        <div style="display:flex;gap:.7rem;margin-bottom:1.2rem;flex-wrap:wrap">
+          <button class="btn btn-p" onclick="generateReport()">⚡ Generate Report</button>
+          <button class="btn btn-g" onclick="printReport()">🖨️ Print</button>
+          <button class="btn btn-g" onclick="downloadReport()">⬇️ Download HTML</button>
+        </div>
+        <div id="reportSheet"></div>
+      </section>
+
+      <section class="page" id="page-account">
+        <div class="panel" id="accountPanel"></div>
+      </section>
+
+      <section class="page" id="page-users">
+        <p class="jmuted" style="margin-bottom:12px">Members select one of six roles at registration and enter immediately. They can change their non-admin role in My Account. Use these controls to help members or disable an account. Only the verified owner email has administrator access.</p>
+        <div class="toolbar"><span style="flex:1"></span><button class="btn btn-p" onclick="openUserModal()">＋ Create Member</button></div>
+        <div class="panel"><div class="tbl-wrap"><table class="tbl" id="userTbl"></table></div></div>
+        <div class="panel" style="margin-top:1.2rem"><h3>🔐 Permission matrix</h3><div class="tbl-wrap"><table class="tbl matrix" id="permTbl"></table></div></div>
+      </section>
+
+      <section class="page" id="page-settings">
+        <div class="panel" style="margin-bottom:1.2rem">
+          <h3>Open role registration</h3>
+          <p>Anyone can register as Designer, BAJMC Documenter, Faculty Reviewer, Event Coordinator, Marketing Manager or Analyst and enter immediately. Roles are self-selected; college positions are not verified. Administrator access remains reserved for the verified owner.</p>
+          <p class="jmuted">Use Team &amp; Roles to manage members or disable an account. Collection evidence still needs faculty or administrator review.</p>
+        </div>
+        <div class="grid-2" style="margin-top:0">
+          <div class="panel">
+            <h3>Image hosting</h3>
+            <p>Add your image files to <b>public/images</b> and redeploy the website. Use their HTTPS URLs in the Media Library. Images count towards Firebase Hosting’s free storage and transfer limits.</p>
+          </div>
+          <div>
+            <div class="panel">
+              <h3>🏫 Studio Profile</h3>
+              <label class="f-label">Studio name</label><input class="f-in" id="setName"/>
+              <label class="f-label">Tagline</label><input class="f-in" id="setTag"/>
+              <button class="btn btn-t" style="margin-top:1.2rem" onclick="saveStudio(this)">Save Profile</button>
+            </div>
+            <div class="panel" style="margin-top:1.2rem">
+              <h3>🗄️ Database Tools</h3>
+              <p style="color:var(--mut);font-size:.8rem;font-weight:600;margin-bottom:.8rem">Data lives in Cloud Firestore. Load demo content for screenshots, or export the records currently loaded in this session (activity is limited).</p>
+              <div style="display:flex;gap:.7rem;flex-wrap:wrap">
+                <button class="btn btn-grape" onclick="loadSampleData(this)">🧸 Load Sample Data</button>
+                <button class="btn btn-g" onclick="exportJson()">⬇️ Export Loaded Snapshot</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<div id="modalWrap"><div class="modal-bg" onclick="closeModal()"></div>
+  <div class="modal">
+    <div class="modal-head"><h3 id="modalTitle">Title</h3><button class="icon-act del" onclick="closeModal()">✕</button></div>
+    <form id="modalForm" ><div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot"><button type="button" class="btn btn-g" onclick="closeModal()">Cancel</button><button type="submit" class="btn btn-p" id="modalSave">Save</button></div></form>
+  </div>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<link rel="stylesheet" href="journey.css">
+<script>
+/* MPP / KidCouture Studio — deployment build 1.0.
+   Deploy together with the accompanying firestore.rules.
+   Spark edition with Cloudinary uploads and Firebase AI Logic. No Cloud Functions.
+*/
+
+/* Firebase web configuration — retained from your supplied project. */
+const firebaseConfig = window.MPP_FIREBASE_CONFIG;
+/* ═══════════════════════════════════════════════════════ */
+
+if(typeof firebase==='undefined'||!firebaseConfig?.projectId){
+  setAuthMessage('msgIn','Sign-in could not load. Check your connection, then refresh.');
+  throw new Error('Firebase SDK unavailable');
+}
+firebase.initializeApp(firebaseConfig);
+window.KidsWearServices?.configure();
+const auth = firebase.auth();
+const fs = firebase.firestore();
+const OWNER_EMAIL = 'krm04094@gmail.com';
+const isOwnerEmail = email => String(email||'').trim().toLowerCase() === OWNER_EMAIL;
+
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const money=n=>'$'+(+n||0).toLocaleString('en-US',{maximumFractionDigits:2});
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clean=s=>String(s??'').trim();
+const inlineId=id=>esc(JSON.stringify(String(id)));
+const validUrl=v=>{if(!v)return true;try{const u=new URL(v);return u.protocol==='https:'&&!u.username&&!u.password;}catch{return false;}};
+const errorText=e=>e?.code==='permission-denied'?'Permission denied. Check your account role and deployed rules.':(e?.message||'Operation failed. Please try again.');
+const dstr=d=>new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+let toastT;
+function toast(msg,ic='✅'){const t=$('#toast');t.textContent=ic+' '+msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),3000);}
+function setBtnLoading(btn,loading){
+  if(!btn)return;
+  if(loading){if(!btn.disabled)btn.dataset.orig=btn.textContent;btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';}
+  else{btn.disabled=false;btn.textContent=btn.dataset.orig||btn.textContent;}
+}
+
+/* ---------- state ---------- */
+const S={designs:[],users:[],media:[],vendors:[],models:[],events:[],posts:[],activity:[],studio:{studioName:'KidCouture Studio',tagline:'FD × BAJMC · Creative journeys'}};
+let user=null, current='dashboard', colState={q:'',st:'',cat:'',evMode:'events'}, selReport='', lastReport='', editingPostId=null, listenersOn=false;
+let profileUnsub=null, authVersion=0, registering=false, modalBusy=false, sampleBusy=false;
+let authFeedbackVersion=0;
+let verificationAccount='', verificationBusy=false, verificationResendAt=0;
+const pendingOperations=new Set();
+const unsubscribers=[];
+
+/* ---------- Scoped realtime data ---------- */
+function setSync(message){const el=$('.live-dot');if(el)el.textContent=navigator.onLine===false?'OFFLINE':message;}
+window.addEventListener('offline',()=>setSync('OFFLINE'));
+window.addEventListener('online',()=>setSync(user?'RECONNECTING':'SIGNED OUT'));
+function listen(col,key,query){
+ const q=query||fs.collection(col), version=authVersion;
+ const off=q.onSnapshot(snap=>{
+  if(version!==authVersion||!user)return;
+  S[key]=snap.docs.map(d=>({...d.data(),id:d.id}));
+  if(!snap.metadata?.fromCache)setSync('LIVE CONNECTION');
+  if(col==='activity')S[key].sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+  try{refreshUI();}catch(e){console.error(e);toast('Display error: '+e.message,'⚠️');}
+ },err=>{S[key]=[];refreshUI();setSync('SYNC ERROR');toast(col+': '+errorText(err),'⚠️');});
+ unsubscribers.push(off);
+}
+function clearRecords(){
+ if(typeof resetIntegrations==='function')resetIntegrations();
+ if(typeof journeyReset==='function')journeyReset();
+ S.projects=[];
+ for(const k of ['designs','users','media','vendors','models','events','posts','activity'])S[k]=[];
+ S.studio={studioName:'KidCouture Studio',tagline:'FD × BAJMC · Creative journeys'};
+ lastReport='';editingPostId=null;selReport='';lastCaps=[];colState={q:'',st:'',cat:'',evMode:'events'};
+ for(const id of ['cq','cst','ccat','pfFilter','psFilter'])$('#'+id).value='';
+
+ $('#reportSheet').innerHTML='';$('#reportSheet').classList.remove('show');
+ for(const key of Object.keys(CH))killChart(key);
+ for(const id of ['designGrid','mediaGrid','evPane','postsList','userTbl','actFeed','dashKpis','trendInsights','mktSnapshot','capOut','swatches'])$('#'+id).innerHTML='';
+ $('#postForm').reset();$('#capName').value='';$('#capContext').value='';$('#modalWrap').classList.remove('show');
+}
+function startListeners(){
+ if(listenersOn||!user)return;listenersOn=true;
+ const r=user.role;
+ listen('projects','projects');
+ if(['admin','analyst','designer','marketer'].includes(r)){
+  let q=fs.collection('designs');
+  if(r==='designer')q=q.where('ownerId','==',user.uid);
+  if(r==='marketer')q=q.where('status','==','approved');
+  listen('designs','designs',q);
+ }
+ if(r==='admin')listen('users','users');
+ if(['admin','designer','documenter','marketer'].includes(r)){
+  let q=fs.collection('media');if(['designer','documenter'].includes(r))q=q.where('ownerId','==',user.uid);
+  listen('media','media',q);
+ }
+ if(['admin','coordinator','analyst'].includes(r)){
+  listen('vendors','vendors');listen('events','events');
+ }
+ if(['admin','coordinator'].includes(r))listen('models','models');
+ if(['admin','marketer','analyst'].includes(r))listen('posts','posts');
+ const activity=r==='admin'?fs.collection('activity').orderBy('date','desc').limit(40):fs.collection('activity').where('userId','==',user.uid);
+ listen('activity','activity',activity);
+ unsubscribers.push(fs.doc('settings/studio').onSnapshot(d=>{
+  if(d.exists){S.studio={...S.studio,...d.data()};$('#sbTag').textContent=S.studio.tagline||'Studio OS';$('#studioBrand').textContent=S.studio.studioName||'KidCouture';}
+  // Preserve unsaved settings edits; refresh them only on entry to the page.
+  if(current!=='settings')refreshUI();
+ },err=>{setSync('SYNC ERROR');toast(errorText(err),'⚠️');}));
+ setSync('LIVE CONNECTION');
+}
+function stopListeners(){unsubscribers.splice(0).forEach(off=>off());listenersOn=false;}
+function refreshUI(){if(user&&RENDER[current])RENDER[current]();}
+function logAct(text){
+ if(!user)return;
+ return fs.collection('activity').add({text:clean(text).slice(0,500),user:user.name,userId:user.uid,date:new Date().toISOString()})
+ .catch(e=>console.warn('Activity entry failed:',e.code));
+}
+
+/* ---------- Authentication and live profile ---------- */
+function toggleLoginMotion(){
+ const paused=document.getElementById('login').classList.toggle('motion-paused');
+ const button=document.getElementById('loginMotionButton');
+ button.setAttribute('aria-pressed',String(paused));
+ button.querySelector('span').textContent=paused?'Resume animations':'Pause animations';
+ button.querySelector('path').setAttribute('d',paused?'M4 2l10 6-10 6z':'M4 2h3v12H4zM9 2h3v12H9z');
+}
+function setAuthMessage(id,message,tone='error'){
+ const el=document.getElementById(id);
+ el.className='login-msg'+(tone==='success'?' ok':tone==='info'?' info':'');
+ el.setAttribute('role',message&&tone==='error'?'alert':'status');
+ el.setAttribute('aria-live',message&&tone==='error'?'assertive':'polite');
+ el.textContent=message;
+}
+function authErrorText(err){
+ const messages={
+  'auth/invalid-credential':'Email or password is incorrect. Please try again.',
+  'auth/wrong-password':'Email or password is incorrect. Please try again.',
+  'auth/user-not-found':'Email or password is incorrect. Please try again.',
+  'auth/invalid-email':'Enter a valid email address.',
+  'auth/email-already-in-use':'This email already has an account. Sign in or use Forgot password.',
+  'auth/weak-password':'Choose a stronger password with at least 6 characters.',
+  'auth/user-disabled':'This account has been disabled. Contact an administrator.',
+  'auth/too-many-requests':'Too many attempts. Please wait a few minutes before trying again.',
+  'auth/network-request-failed':'Could not connect. Check your internet connection and try again.'
+ };
+ return messages[err?.code]||errorText(err);
+}
+function setPasswordVisible(id,visible){
+ const input=document.getElementById(id),button=document.querySelector('[data-password="'+id+'"]');
+ if(!input||!button)return;
+ input.type=visible?'text':'password';
+ button.textContent=visible?'Hide':'Show';
+ button.setAttribute('aria-label',visible?'Hide password':'Show password');
+ button.setAttribute('aria-pressed',String(visible));
+}
+function togglePassword(id){
+ const input=document.getElementById(id);
+ if(input)setPasswordVisible(id,input.type==='password');
+}
+function hidePasswords(clear=false){
+ for(const id of ['liPass','ruPass']){setPasswordVisible(id,false);if(clear)document.getElementById(id).value='';}
+}
+function showSignedOut(message='',tone='error'){
+ authFeedbackVersion++;hidePasswords(true);
+ stopListeners();clearRecords();user=null;
+ $('#login').style.display='grid';$('#app').classList.remove('on');
+ verificationAccount='';$('#verifyPanel').classList.add('hidden');$('.auth-tabs').classList.remove('hidden');
+ $('#formIn').classList.remove('hidden');$('#formUp').classList.add('hidden');
+ $('#tabIn').classList.add('active');$('#tabUp').classList.remove('active');$('#tabIn').setAttribute('aria-pressed','true');$('#tabUp').setAttribute('aria-pressed','false');
+ $('#verifyRefresh').disabled=false;$('#verifyResend').disabled=false;
+ setSync('SIGNED OUT');
+ if(message)setAuthMessage('msgIn',message,tone);
+}
+function showEmailVerification(au,message='Open the verification email, including your spam folder, then select the button below.',tone='info'){
+ showSignedOut();verificationAccount=au.uid;verificationBusy=false;
+ $('.auth-tabs').classList.add('hidden');$('#formIn').classList.add('hidden');$('#formUp').classList.add('hidden');
+ $('#verifyPanel').classList.remove('hidden');$('#verifyEmail').textContent=au.email||'';
+ setAuthMessage('verifyMessage',message,tone);
+}
+async function refreshEmailVerification(){
+ const au=auth.currentUser;if(!au||au.uid!==verificationAccount||verificationBusy)return;
+ const version=authVersion;verificationBusy=true;$('#verifyRefresh').disabled=true;$('#verifyResend').disabled=true;
+ setAuthMessage('verifyMessage','Checking your email verification…','info');
+ try{
+  await au.reload();await au.getIdToken(true);
+  if(version!==authVersion||auth.currentUser?.uid!==au.uid)return;
+  if(!au.emailVerified){setAuthMessage('verifyMessage','Your email is not verified yet. Open the latest email link, then try again.','info');return;}
+  await watchAuth(auth.currentUser);
+ }catch(e){if(version===authVersion&&auth.currentUser?.uid===au.uid)setAuthMessage('verifyMessage',authErrorText(e));}
+ finally{if(version===authVersion){verificationBusy=false;$('#verifyRefresh').disabled=false;$('#verifyResend').disabled=false;}}
+}
+async function resendVerificationEmail(){
+ const au=auth.currentUser;if(!au||au.uid!==verificationAccount||verificationBusy)return;
+ if(Date.now()<verificationResendAt){setAuthMessage('verifyMessage','Please wait a minute before requesting another verification email.','info');return;}
+ const version=authVersion;verificationBusy=true;$('#verifyRefresh').disabled=true;$('#verifyResend').disabled=true;
+ try{
+  await au.sendEmailVerification();
+  if(version===authVersion&&auth.currentUser?.uid===au.uid){verificationResendAt=Date.now()+60000;setAuthMessage('verifyMessage','Verification email sent. Check your inbox and spam folder.','success');}
+ }catch(e){if(version===authVersion&&auth.currentUser?.uid===au.uid)setAuthMessage('verifyMessage',authErrorText(e));}
+ finally{if(version===authVersion){verificationBusy=false;$('#verifyRefresh').disabled=false;$('#verifyResend').disabled=false;}}
+}
+async function watchAuth(au){
+ const version=++authVersion;
+ if(profileUnsub){profileUnsub();profileUnsub=null;}
+ showSignedOut();verificationBusy=false;
+ if(!au)return;
+ if(isOwnerEmail(au.email)){
+  if(!au.emailVerified){showEmailVerification(au);return;}
+  // The rules allow only this exact verified email to bootstrap the owner profile.
+  const ref=fs.collection('users').doc(au.uid),snap=await ref.get({source:'server'});
+  if(version!==authVersion||auth.currentUser?.uid!==au.uid)return;
+  const saved=snap.exists?snap.data():null;
+  if(!saved||saved.role!=='admin'||saved.active!==true||saved.enrollment==='student'){
+   await ref.set({name:saved?.name||au.displayName||'Administrator',email:au.email,role:'admin',active:true,enrollment:'managed'});
+   if(version!==authVersion||auth.currentUser?.uid!==au.uid)return;
+  }
+ }
+ profileUnsub=fs.collection('users').doc(au.uid).onSnapshot(async snap=>{
+  if(version!==authVersion||auth.currentUser?.uid!==au.uid)return;
+  if(!snap.exists||snap.data().active!==true){
+   const message=snap.exists?'Your account is disabled or belongs to the earlier approval system. Contact the administrator.':'Your account profile is missing. Contact the administrator to restore it.';
+   showSignedOut(message);await auth.signOut().catch(e=>setAuthMessage('msgIn',authErrorText(e)));return;
+  }
+  const u=snap.data();
+  if(!ROLE_META[u.role]||(u.role==='admin'&&!isOwnerEmail(au.email))){
+   showSignedOut('This account is not the configured administrator. Ask the owner to assign a staff or student role.');await auth.signOut();return;
+  }
+  const changed=!user||user.role!==u.role||user.uid!==au.uid;
+  if(changed){stopListeners();clearRecords();}
+  user={...u,uid:au.uid};
+  $('#login').style.display='none';$('#app').classList.add('on');
+  $('#uName').textContent=u.name;$('#uRole').textContent=ROLE_META[u.role].label;
+  $('#uRole').style.color=ROLE_META[u.role].color;
+  $('#uAvatar').textContent=(u.name||'?').split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
+  buildNav();
+  if(changed){startListeners();go('journey');}else refreshUI();
+ },async err=>{if(version!==authVersion)return;showSignedOut(errorText(err));await auth.signOut().catch(()=>{});});
+}
+auth.onAuthStateChanged(au=>{if(!registering)watchAuth(au).catch(e=>showSignedOut(errorText(e)));});
+$('#formIn').addEventListener('submit',async e=>{
+ e.preventDefault();const form=e.currentTarget,btn=form.querySelector('button[type=submit]');
+ if(btn.disabled||!form.reportValidity())return;
+ authFeedbackVersion++;setBtnLoading(btn,true);btn.setAttribute('aria-label','Signing in');setAuthMessage('msgIn','');
+ try{await auth.signInWithEmailAndPassword($('#liEmail').value.trim(),$('#liPass').value);}
+ catch(err){setAuthMessage('msgIn',authErrorText(err));}
+ finally{setBtnLoading(btn,false);btn.removeAttribute('aria-label');$('#liPass').value='';hidePasswords();}
+});
+async function resetPassword(){
+ const input=$('#liEmail'),btn=$('#resetPasswordBtn'),email=input.value.trim();
+ if(btn.disabled)return;
+ if(!email||!input.checkValidity()){
+  setAuthMessage('msgIn','Enter a valid email address above, then select Forgot password.');input.focus();return;
+ }
+ const version=++authFeedbackVersion;btn.disabled=true;btn.textContent='Sending reset link…';setAuthMessage('msgIn','');
+ try{
+  await auth.sendPasswordResetEmail(email);
+  if(version===authFeedbackVersion)setAuthMessage('msgIn','If this address has an account, a reset email has been sent. Check your inbox and spam folder.','success');
+ }catch(e){if(version===authFeedbackVersion)setAuthMessage('msgIn',authErrorText(e));}
+ finally{btn.disabled=false;btn.textContent='Forgot password?';}
+}
+function refreshRegistrationFields(){
+ const owner=isOwnerEmail($('#ruEmail').value);
+ $('#studentRegistrationFields').classList.toggle('hidden',owner);$('#ownerRegistrationNotice').classList.toggle('hidden',!owner);
+ $('#ruRole').disabled=owner;
+}
+$('#ruEmail').addEventListener('input',refreshRegistrationFields);
+$('#formUp').addEventListener('submit',async e=>{
+ e.preventDefault();const form=e.currentTarget,btn=form.querySelector('button[type=submit]');
+ refreshRegistrationFields();if(btn.disabled||!form.reportValidity())return;
+ const name=clean($('#ruName').value),email=$('#ruEmail').value.trim().toLowerCase(),pass=$('#ruPass').value,role=$('#ruRole').value,owner=isOwnerEmail(email);
+ if(!name||name.length>100){setAuthMessage('msgUp','Enter a name of 1–100 characters.');return;}
+ if(!owner&&!PUBLIC_ROLES.includes(role)){setAuthMessage('msgUp','Choose one of the six available roles. Administrator access is reserved for the owner.');return;}
+ authFeedbackVersion++;setBtnLoading(btn,true);btn.setAttribute('aria-label','Creating account');registering=true;setAuthMessage('msgUp','');
+ let created=null,ready=false,notice='',tone='success';
+ try{
+  const cred=await auth.createUserWithEmailAndPassword(email,pass);created=cred.user;
+  if(owner){
+   ready=true;await created.updateProfile({displayName:name});
+   await created.sendEmailVerification();verificationResendAt=Date.now()+60000;
+   notice='Account created. Verify the owner email using the link, then return here.';
+  }else{
+   await fs.collection('users').doc(created.uid).set({name,email:created.email,role,active:true,enrollment:'self'});
+   ready=true;
+  }
+ }catch(err){
+  if(ready){notice='Your account was created, but the verification email could not be sent. Use Resend verification email. '+authErrorText(err);tone='error';}
+  else{
+   let message=authErrorText(err);
+   if(created){try{await created.delete();}catch{message+=' Your login may exist without a profile; contact the owner for help.';}await auth.signOut().catch(()=>{});}
+   setAuthMessage('msgUp',message);
+  }
+ }finally{
+  registering=false;setBtnLoading(btn,false);btn.removeAttribute('aria-label');$('#ruPass').value='';hidePasswords();
+  if(ready){form.reset();refreshRegistrationFields();await watchAuth(auth.currentUser);if(verificationAccount===created.uid)setAuthMessage('verifyMessage',notice,tone);}
+ }
+});
+function switchAuth(which){
+ authFeedbackVersion++;hidePasswords(true);
+ $('#formIn').classList.toggle('hidden',which!=='in');$('#formUp').classList.toggle('hidden',which==='in');
+ $('#tabIn').classList.toggle('active',which==='in');$('#tabUp').classList.toggle('active',which!=='in');
+ $('#tabIn').setAttribute('aria-pressed',String(which==='in'));$('#tabUp').setAttribute('aria-pressed',String(which!=='in'));
+ setAuthMessage('msgIn','');setAuthMessage('msgUp','');
+}
+async function logout(){
+ try{await auth.signOut();if(profileUnsub){profileUnsub();profileUnsub=null;}switchAuth('in');showSignedOut('You have signed out successfully.','info');}
+ catch(e){toast('Sign-out failed: '+errorText(e),'⚠️');}
+}
+
+
+/* ---------- RBAC ---------- */
+const PUBLIC_ROLES=['designer','documenter','faculty','coordinator','marketer','analyst'];
+const ROLE_META={
+ documenter:{label:'BAJMC Documenter',color:'#967344'},
+ faculty:{label:'Faculty Reviewer',color:'#567b62'},
+ admin:{label:'Administrator',color:'#ff6b95'},
+ designer:{label:'Fashion Designer',color:'#2bb3a3'},
+ coordinator:{label:'Event Coordinator',color:'#ffa94d'},
+ marketer:{label:'Marketing Manager',color:'#8b7cf6'},
+ analyst:{label:'Analyst',color:'#4cc47c'}
+};
+const NAV=[
+ {id:'journey',ic:'✦',label:'Collection Journeys',roles:['admin','designer','documenter','faculty','coordinator','marketer','analyst']},
+ {id:'dashboard',ic:'📊',label:'Dashboard',roles:['admin',...PUBLIC_ROLES]},
+ {id:'collections',ic:'👗',label:'Design Inventory',roles:['admin','designer']},
+ {id:'media',ic:'🖼️',label:'Media Library',roles:['admin','designer','documenter','marketer']},
+ {id:'events',ic:'🎪',label:'Events & Ops',roles:['admin','coordinator']},
+ {id:'marketing',ic:'📣',label:'Marketing',roles:['admin','marketer']},
+ {id:'ai',ic:'🤖',label:'Creative Tools',roles:['admin','designer','documenter','marketer']},
+ {id:'reports',ic:'📑',label:'Reports',roles:['admin',...PUBLIC_ROLES]},
+ {id:'account',ic:'◎',label:'My Account',roles:['admin',...PUBLIC_ROLES]},
+ {id:'users',ic:'👥',label:'Team & Roles',roles:['admin']},
+ {id:'settings',ic:'⚙️',label:'Settings',roles:['admin']}
+];
+const TITLES={account:'My Account',dashboard:'Dashboard',collections:'Collections & Designs',media:'Media Library',events:'Events & Operations',marketing:'Marketing',ai:'Creative Tools',reports:'Auto Reports',users:'Team & Roles',settings:'Settings'};
+const isAdmin=()=>user?.role==='admin'&&isOwnerEmail(auth.currentUser?.email)&&auth.currentUser?.emailVerified===true;
+const myDesigns=()=>user?.role==='designer'?S.designs.filter(d=>d.ownerId===user.uid):S.designs;
+
+function buildNav(){
+ $('#navList').innerHTML=NAV.filter(n=>n.roles.includes(user.role))
+  .map(n=>`<button class="nav-item" id="nav-${esc(n.id)}" onclick="go(${inlineId(n.id)})"><i>${n.ic}</i>${n.label}</button>`).join('');
+}
+$('#hamBtn').onclick=()=>$('#sidebar').classList.toggle('open');
+function go(id){
+ if(!user||!NAV.some(n=>n.id===id&&n.roles.includes(user.role)))return toast('You do not have access to this page.','⛔');
+ if(modalBusy)return toast('Please wait for the current save.','⚠️');
+  $$('.page').forEach(p=>p.classList.remove('show'));
+  $('#page-'+id)?.classList.add('show');
+  $$('.nav-item').forEach(n=>n.classList.remove('active'));
+  $('#nav-'+id)?.classList.add('active');
+  $('#tbTitle').textContent=TITLES[id]||'KidCouture';
+  $('#sidebar').classList.remove('open');
+  current=id;refreshUI();if(id==='settings')renderSettings();
+}
+
+/* ---------- modal ---------- */
+function openModal(title,body,onSave,label='Save'){
+ if(modalBusy)return;
+ if(typeof cancelImageUploads==='function')cancelImageUploads($('#modalBody'));
+ $('#modalTitle').textContent=title;$('#modalBody').innerHTML=body;$('#modalSave').textContent=label;
+ if(typeof enhanceImageUploads==='function')enhanceImageUploads($('#modalBody'));
+ $('#modalForm').onsubmit=async e=>{
+  e.preventDefault();const form=e.currentTarget;
+  if(modalBusy||!form.reportValidity())return;
+  modalBusy=true;setBtnLoading($('#modalSave'),true);
+  try{const result=await onSave(Object.fromEntries(new FormData(form)),form);if(result!==false){modalBusy=false;closeModal();}}
+  catch(err){toast(errorText(err),'⚠️');}
+  finally{modalBusy=false;setBtnLoading($('#modalSave'),false);}
+ };
+ $('#modalWrap').classList.add('show');
+}
+function closeModal(){if(!modalBusy){if(typeof cancelImageUploads==='function')cancelImageUploads($('#modalBody'));$('#modalWrap').classList.remove('show');}}
+
+
+/* ---------- charts ---------- */
+const CH={};
+if(typeof Chart==='undefined'){window.Chart=function(){this.destroy=()=>{};};setAuthMessage('msgIn','Charts could not load; other features remain available.','info');}
+function killChart(k){ if(CH[k]){try{CH[k].destroy();}catch(e){} delete CH[k]; } }
+
+/* ============ DASHBOARD ============ */
+function animNum(el,val,pre='',suf=''){
+ if(!el)return;
+ el.textContent=(pre||'')+val.toLocaleString()+(suf||'');
+}
+function renderDashboard(){
+ const creative=['documenter','faculty'].includes(user.role);
+ $('#designDashboardCharts').classList.toggle('hidden',creative);$('#creativeOverview').classList.toggle('hidden',!creative);
+ if(creative){
+  killChart('m');killChart('c');const projects=S.projects||[],mine=projects.filter(p=>p.ownerId===user.uid);
+  const counts=[['Collections',projects.length],['Active collections',projects.filter(p=>!p.archived&&!p.deleting).length],[user.role==='documenter'?'My media assets':'Archived collections',user.role==='documenter'?S.media.length:projects.filter(p=>p.archived).length],['My collections',mine.length]];
+  $('#dashKpis').innerHTML=counts.map(([label,count])=>`<div class="kpi"><div><b>${count}</b><span>${label}</span></div></div>`).join('');
+  $('#creativeOverview').innerHTML=`<h3>${user.role==='documenter'?'Your documentation workspace':'Your review workspace'}</h3><p>${user.role==='documenter'?'Start or open a collection, record production notes and interviews, upload images, and prepare captions and portfolio reports.':'Open a collection to review its stage evidence and leave feedback. Collection reports summarize the shared studio.'}</p><div class="jactions"><button class="btn btn-p" onclick="go('journey')">Open collections</button>${user.role==='documenter'?'<button class="btn" onclick="go(\'journey\');editProject()">New collection</button><button class="btn" onclick="go(\'media\')">My media</button>':''}<button class="btn" onclick="go('reports')">Collection reports</button></div>`;
+  $('#actFeed').innerHTML=S.activity.slice(0,8).map(a=>`<div class="insight-li">${esc(a.text)} · ${dstr(a.date)}</div>`).join('')||'<div class="empty-state">Your activity will appear here as you work.</div>';
+  return;
+ }
+ const D=myDesigns(),appr=D.filter(d=>d.status==='approved');
+ const totBudget=S.events.reduce((s,e)=>s+ +e.budget,0);
+ const spent=S.events.reduce((s,e)=>s+(e.expenses||[]).reduce((a,x)=>a+ +x.amount,0),0);
+ const kpis=[
+  ['👗',D.length,'Total Designs','linear-gradient(135deg,#ffe3ec,#ffc7d9)'],
+  ['✅',(D.length?Math.round(appr.length/D.length*100):0),'% Approved','linear-gradient(135deg,#ddf6e7,#b8ecd0)',true],
+  ['🎪',S.events.filter(e=>e.status!=='Completed').length,'Active Events','linear-gradient(135deg,#fff3d6,#ffe4a8)'],
+  ['💰',(totBudget-spent),'Budget Remaining ($)','linear-gradient(135deg,#e5e9fb,#ccd6fb)',false,true],
+  ['🖼️',S.media.length,'Media Assets','linear-gradient(135deg,#efeaff,#ddd4ff)'],
+  ['📣',S.posts.filter(p=>p.status==='published').length,'Posts Marked Published','linear-gradient(135deg,#e0f7f4,#bdeee7)']
+ ];
+ $('#dashKpis').innerHTML=kpis.map((k,i)=>`<div class="kpi"><div class="kpi-ic" style="background:${k[3]}">${k[0]}</div><div><b id="kn${i}">0</b><span>${k[2]}</span></div></div>`).join('');
+ kpis.forEach((k,i)=>animNum($('#kn'+i),k[1],k[4]?'':(k[5]?'$':''),k[4]?'%':''));
+
+ const labels=[],data=[],now=new Date();
+ for(let i=5;i>=0;i--){
+   const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+   labels.push(d.toLocaleDateString('en-US',{month:'short'}));
+   data.push(D.filter(x=>(x.date||'').slice(0,7)===`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`).length);
+ }
+ killChart('m');
+ CH.m=new Chart($('#cMonths'),{type:'bar',data:{labels,datasets:[{label:'Designs added',data,backgroundColor:'rgba(255,107,149,.75)',hoverBackgroundColor:'#ff6b95',borderRadius:10}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1,precision:0}}}}});
+
+ const cats={};appr.forEach(d=>cats[d.cat]=(cats[d.cat]||0)+1);
+ killChart('c');
+ CH.c=new Chart($('#cCats'),{type:'doughnut',data:{labels:Object.keys(cats).length?Object.keys(cats):['No data'],datasets:[{data:Object.keys(cats).length?Object.values(cats):[1],backgroundColor:['#ff6b95','#2bb3a3','#ffb84d','#8b7cf6','#4cc47c'],borderWidth:3,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyle:'circle',padding:14,font:{family:'Quicksand',weight:'700'}}}}}});
+ $('#actFeed').innerHTML=S.activity.slice(0,8).map(a=>`<div class="insight-li"><span style="color:var(--pink)">●</span><span style="flex:1">${esc(a.text)}</span><span style="color:var(--mut);font-weight:700;white-space:nowrap">${esc(a.user)} · ${dstr(a.date)}</span></div>`).join('')||'<div class="empty-state">No activity yet</div>';
+}
+
+/* ============ COLLECTIONS ============ */
+const CAT_EMOJI={Casual:'👕',Party:'🎉',School:'🎒',Seasonal:'🍂',Accessories:'🎒'};
+function openDesignModal(id){
+ if(!['admin','designer'].includes(user?.role))return toast('Not permitted','⛔');
+ const d=id?S.designs.find(x=>x.id===id):null;
+ if(id&&!d)return toast('Design no longer available','⚠️');
+ if(d&&!isAdmin()&&(d.ownerId!==user.uid||d.status==='approved'))return toast('This design is locked. Ask an admin to reopen it.','⛔');
+ openModal(d?'Edit Design':'New Design Submission',`
+  <div class="form-grid">
+   <div class="full"><label class="f-label">Design name *</label><input class="f-in" name="name" required value="${d?esc(d.name):''}"/></div>
+   <div><label class="f-label">Brand / Vendor</label>${user.role==='designer'?`<input class="f-in" name="brand" value="${esc(user.brand||user.name+' Label')}" readonly/>`:`<select class="f-in" name="brand">${['Sofia Mini','Hart & Thread','Tiny Sprout','Little Luxe'].map(b=>`<option ${d&&d.brand===b?'selected':''}>${b}</option>`).join('')}</select>`}</div>
+   <div><label class="f-label">Category</label><select class="f-in" name="cat">${['Casual','Party','School','Seasonal','Accessories'].map(c=>`<option ${d&&d.cat===c?'selected':''}>${c}</option>`).join('')}</select></div>
+   <div><label class="f-label">Season</label><select class="f-in" name="season">${['All','Spring','Summer','Autumn','Winter'].map(s=>`<option ${d&&d.season===s?'selected':''}>${s}</option>`).join('')}</select></div>
+   <div><label class="f-label">Price ($) *</label><input class="f-in" name="price" type="number" min="0.01" max="1000000" step="0.01" required value="${d?esc(d.price):''}"/></div>
+   <div><label class="f-label">Size range</label><input class="f-in" name="sizes" value="${d?esc(d.sizes):'2Y – 10Y'}"/></div>
+   <div><label class="f-label">Fabric</label><input class="f-in" name="fabric" value="${d?esc(d.fabric):''}"/></div>
+   <div class="full"><label class="f-label">Image URL</label><input class="f-in" name="img" data-cloud-image type="url" maxlength="2048" value="${d?esc(d.img):''}" placeholder="https://…"/></div>
+  </div>`,
+ async data=>{
+   const rec={name:clean(data.name),brand:data.brand,cat:data.cat,season:data.season,price:+data.price,sizes:clean(data.sizes),fabric:clean(data.fabric),img:data.img.trim()};
+   if(!rec.name||rec.name.length>100)return toast('Design name must contain 1–100 characters','⚠️'),false;
+   if(!Number.isFinite(rec.price)||rec.price<=0||rec.price>1000000)return toast('Enter a positive price up to 1,000,000','⚠️'),false;
+   if(!validUrl(rec.img))return toast('Use an HTTPS image URL','⚠️'),false;
+   try{
+     if(d){await fs.collection('designs').doc(d.id).update({...rec,...(!isAdmin()?{status:'pending',reviewedBy:''}:{})});logAct(`Updated design "${rec.name}"`);toast('Design updated');}
+     else{await fs.collection('designs').add({...rec,status:'pending',date:new Date().toISOString(),ownerId:user.uid,reviewedBy:''});logAct(`Submitted design "${rec.name}"`);toast('Submitted for review');}
+     return true;
+   }catch(e){toast(e.code==='permission-denied'?'⛔ You do not have permission for this action':e.message,'⚠️');return false;}
+ });
+}
+async function setStatus(id,st){
+ if(!isAdmin())return toast('Only Administrators can review designs','⛔');
+ const d=S.designs.find(x=>x.id===id);if(!d)return;
+ try{
+   await fs.collection('designs').doc(id).update({status:st,reviewedBy:st==='pending'?'':user.name});
+   logAct(`${st==='pending'?'Re-opened review for':st.charAt(0).toUpperCase()+st.slice(1)+'d'} "${d.name}"`);
+   toast(`"${d.name}" marked ${st}`,st==='approved'?'✅':'🚫');
+ }catch(e){toast('Server denied: '+e.code,'⚠️');}
+}
+async function deleteDesign(id){
+ const d=S.designs.find(x=>x.id===id);if(!d)return;
+ if(!(isAdmin()||(user.role==='designer'&&d.ownerId===user.uid)))return toast('Not permitted','⛔');
+ if(!confirm(`Delete "${d.name}" permanently from the cloud database?`))return;
+ try{await fs.collection('designs').doc(id).delete();logAct(`Deleted design "${d.name}"`);toast('Deleted','🗑️');}
+ catch(e){toast('Server denied','⚠️');}
+}
+function renderCollections(){
+ let list=myDesigns();
+ if(colState.q)list=list.filter(d=>(d.name||'').toLowerCase().includes(colState.q.toLowerCase()));
+ if(colState.st)list=list.filter(d=>d.status===colState.st);
+ if(colState.cat)list=list.filter(d=>d.cat===colState.cat);
+ if(!list.length){$('#designGrid').innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="big">🧵</div>No designs match.</div>';return;}
+ $('#designGrid').innerHTML=list.map(d=>{
+  const mine=isAdmin()||(user.role==='designer'&&d.ownerId===user.uid);
+  const locked=d.status==='approved'&&!isAdmin();
+  let acts='';
+  if(isAdmin()){
+    if(d.status!=='approved')acts+=`<button class="icon-act ok" title="Approve" onclick="setStatus(${inlineId(d.id)},'approved')">✓</button>`;
+    if(d.status!=='rejected')acts+=`<button class="icon-act no" title="Reject" onclick="setStatus(${inlineId(d.id)},'rejected')">✕</button>`;
+    if(d.status!=='pending')acts+=`<button class="icon-act ed" title="Re-open" onclick="setStatus(${inlineId(d.id)},'pending')">⟲</button>`;
+  }
+  if(mine&&!locked)acts+=`<button class="icon-act ed" title="Edit" onclick="openDesignModal(${inlineId(d.id)})">✎</button>`;
+  if(mine)acts+=`<button class="icon-act del" title="Delete" onclick="deleteDesign(${inlineId(d.id)})">🗑</button>`;
+  return `<article class="d-card">
+    <div class="d-media"><div class="fall">${CAT_EMOJI[d.cat]||'👗'}</div>
+      ${d.img?`<img loading="lazy" src="${esc(d.img)}" onerror="this.remove()"/>`:''}
+      <span class="pill st-${esc(d.status)}">${esc(d.status)}</span>
+      ${locked?'<span class="d-lock">🔒 Locked</span>':''}
+    </div>
+    <div class="d-body"><h4>${esc(d.name)}</h4>
+      <div class="meta-row"><span class="mchip">${esc(d.cat)}</span><span class="mchip">${esc(d.season)}</span><span class="mchip">${esc(d.sizes)}</span></div>
+      <div class="vendor-tag">by ${esc(d.brand)}${d.reviewedBy?' · reviewed by '+esc(d.reviewedBy):''}</div>
+      <div class="d-foot"><span class="price-tag">${money(d.price)}</span><div class="act-row">${acts}</div></div>
+    </div></article>`;
+ }).join('');
+}
+
+/* ============ MEDIA ============ */
+async function addMediaUrl(e){
+ e.preventDefault();const form=e.currentTarget,btn=form.querySelector('button[type=submit]');
+ if(btn.disabled||!form.reportValidity())return;
+ if(!['admin','designer','documenter','marketer'].includes(user?.role))return toast('Not permitted','⛔');
+ const name=clean($('#mediaName').value),url=$('#mediaUrl').value.trim();
+ if(!name||name.length>200||!url||!validUrl(url)||url.length>2048)return toast('Enter an image name and a complete HTTPS image URL.','⚠️');
+ setBtnLoading(btn,true);
+ const cloud=window.KIDSWEAR_INTEGRATIONS?.cloudinary?.cloudName;
+ const src=cloud&&new URL(url).hostname==='res.cloudinary.com'&&new URL(url).pathname.startsWith('/'+cloud+'/image/upload/')?'CLOUD':'URL';
+ try{await fs.collection('media').add({name,url,src,date:new Date().toISOString(),ownerId:user.uid});form.reset();form.querySelectorAll('.upload-note').forEach(n=>n.textContent='JPG, PNG or WebP · up to 5 MB');toast('Image saved to library');}
+ catch(err){toast(errorText(err),'⚠️');}finally{setBtnLoading(btn,false);}
+}
+$('#mediaUrlForm').addEventListener('submit',addMediaUrl);
+function copyUrl(id){
+ const m=S.media.find(x=>x.id===id);if(!m)return;
+ if(navigator.clipboard){
+   navigator.clipboard.writeText(m.url).then(()=>toast('URL copied','📋')).catch(()=>toast('Copy failed','⚠️'));
+ }else{
+   toast('Clipboard not available','⚠️');
+ }
+}
+async function deleteRecord(collection,id,message='Record removed'){
+ const key=collection+'/'+id;if(pendingOperations.has(key))return;
+ pendingOperations.add(key);
+ try{await fs.collection(collection).doc(id).delete();logAct(`Removed a ${collection} record`);toast(message);}
+ catch(e){toast(errorText(e),'⚠️');}
+ finally{pendingOperations.delete(key);}
+}
+async function deleteMedia(id){
+ if(!(isAdmin()||S.media.find(x=>x.id===id)?.ownerId===user.uid))return toast('Not permitted','⛔');
+ if(!confirm('Remove this image link? The original image file will remain at its source.'))return;
+ await deleteRecord('media',id,'Library record removed');
+}
+
+
+function renderMedia(){
+ $('#mediaGrid').innerHTML=S.media.map(m=>`
+  <div class="m-item">
+    <span class="src-badge">${esc(m.src||'IMG')}</span>
+    <img loading="lazy" src="${esc(m.url)}" alt="" onerror="this.style.display='none'"/>
+    <div class="m-actions">
+      <button class="icon-act ed" title="Copy URL" onclick="copyUrl(${inlineId(m.id)})">🔗</button>
+      ${(isAdmin()||m.ownerId===user.uid)?`<button class="icon-act del" onclick="deleteMedia(${inlineId(m.id)})">🗑</button>`:''}
+    </div></div>`).join('')||'<div class="empty-state" style="grid-column:1/-1"><div class="big">🖼️</div>No media yet.</div>';
+}
+/* ============ EVENTS & OPS ============ */
+function evTab(mode,btn){
+ colState.evMode=mode;
+ $$('.tab[data-et]').forEach(t=>t.classList.remove('active'));btn.classList.add('active');
+ renderEvents();
+}
+const evSpent=e=>(e.expenses||[]).reduce((s,x)=>s+ +x.amount,0);
+function renderEvents(){
+ if(user.role!=='coordinator'&&user.role!=='admin'){
+  $('#evKpis').innerHTML='';
+  $('#evPane').innerHTML='<div class="empty-state"><div class="big">🔒</div>Only Event Coordinators and Administrators can access this section.<br/><br/><button class="btn btn-g" onclick="go(\'dashboard\')">← Go to Dashboard</button></div>';
+  return;
+ }
+ if(colState.evMode==='events'){
+  const tot=S.events.reduce((s,e)=>s+ +e.budget,0);
+  const sp=S.events.reduce((s,e)=>s+evSpent(e),0);
+  $('#evKpis').innerHTML=[['💰',money(tot),'Total Budgets','#fff3d6'],['🔥',money(sp),'Total Spent','#ffe4e9'],['🪙',money(tot-sp),'Remaining','#ddf6e7'],['📅',S.events.filter(e=>e.status==='Planned').length,'Planned','#e5e9fb']]
+   .map(k=>`<div class="kpi"><div class="kpi-ic" style="background:${k[3]}">${k[0]}</div><div><b>${k[1]}</b><span>${k[2]}</span></div></div>`).join('');
+  $('#evPane').innerHTML=`<div class="toolbar"><span style="flex:1"></span><button class="btn btn-p" id="newEvBtn" onclick="openEventModal()">＋ New Event</button></div>`+S.events.map(e=>{
+   const spent=evSpent(e),budget=+e.budget||0,pct=budget?Math.round(spent/budget*100):0;
+   const vens=(e.vendorIds||[]).map(id=>S.vendors.find(v=>v.id===id)).filter(Boolean);
+   const mods=(e.modelIds||[]).map(id=>S.models.find(m=>m.id===id)).filter(Boolean);
+   return `<div class="ev-card" id="ev-${esc(e.id)}">
+    <div class="ev-head"><div><h4>${esc(e.title)}</h4>
+      <div class="ev-meta"><span>${esc(e.type)}</span><span>📅 ${dstr(e.date)}</span><span>📍 ${esc(e.venue)}</span><span class="pill st-${esc((e.status||'Planned').toLowerCase())}">${esc(e.status)}</span></div></div>
+     <div class="act-row">
+      <button class="icon-act ed" title="Edit" onclick="openEventModal(${inlineId(e.id)})">✎</button>
+      <button class="icon-act ed" title="Assign team" onclick="openAssignModal(${inlineId(e.id)})">👥</button>
+      <button class="icon-act del" title="Delete" onclick="deleteEvent(${inlineId(e.id)})">🗑</button>
+      <button class="icon-act ed" title="Expenses" onclick="document.getElementById(${inlineId('ev-'+e.id)}).classList.toggle('open')">₮</button>
+     </div></div>
+    <div class="budget-bar"><i class="${spent>budget?'over':''}" style="width:${Math.min(100,pct)}%"></i></div>
+    <div class="budget-txt">${money(spent)} spent of ${money(budget)} (${pct}%)</div>
+    <div class="team-chips">${vens.map(v=>`<span class="tchip">🚚 ${esc(v.name)}</span>`).join('')}${mods.map(m=>`<span class="tchip">🧒 ${esc(m.name)}</span>`).join('')||(vens.length||mods.length?'':'<span class="tchip">No team assigned yet</span>')}</div>
+    <div class="exp-list">
+      ${(e.expenses||[]).length?(e.expenses||[]).map(x=>`<div class="exp-row"><span>${esc(x.desc)}</span><span>${money(x.amount)}</span></div>`).join(''):'<div class="exp-row" style="color:var(--mut)">No expenses recorded</div>'}
+      <div class="exp-add"><input class="f-in" id="exd-${esc(e.id)}" placeholder="Description"/><input class="f-in" id="exa-${esc(e.id)}" type="number" min="0.01" max="1000000" step="0.01" placeholder="$ Amount"/><button type="button" class="btn btn-t btn-sm" onclick="addExpense(${inlineId(e.id)})">＋ Add</button></div>
+    </div></div>`;
+  }).join('')||'<div class="empty-state"><div class="big">🎪</div>No events yet — create one!</div>';
+ }else if(colState.evMode==='vendors'){
+  $('#evKpis').innerHTML='';
+  $('#evPane').innerHTML=`<div class="toolbar"><span style="flex:1"></span><button class="btn btn-p" onclick="openVendorModal()">＋ Add Vendor</button></div>
+  <div class="panel"><div class="tbl-wrap"><table class="tbl"><tr><th>Vendor</th><th>Service</th><th>Contact</th><th>Rate/Event</th><th></th></tr>
+  ${S.vendors.map(v=>`<tr><td><b>${esc(v.name)}</b></td><td>${esc(v.service)}</td><td>${esc(v.contact)}</td><td>${money(v.rate)}</td>
+  <td><div class="act-row"><button class="icon-act ed" onclick="openVendorModal(${inlineId(v.id)})">✎</button><button class="icon-act del" onclick="delOpVendor(${inlineId(v.id)})">🗑</button></div></td></tr>`).join('')||'<tr><td colspan="5" class="empty-state">No vendors yet</td></tr>'}
+  </table></div></div>`;
+ }else{
+  $('#evKpis').innerHTML='';
+  $('#evPane').innerHTML=`<div class="toolbar"><span style="flex:1"></span><button class="btn btn-p" onclick="openModelModal()">＋ Add Model</button></div>
+  <div class="cards-grid">${S.models.map(m=>`<div class="d-card"><div class="d-media" style="aspect-ratio:1/.7"><div class="fall">🧒</div></div>
+   <div class="d-body"><h4>${esc(m.name)} <span class="mchip">${esc(m.age)} yrs</span></h4>
+   <div class="meta-row"><span class="mchip">📏 ${esc(m.height)}</span><span class="mchip">${esc(m.specialty)}</span></div>
+   <div class="vendor-tag">Guardian: ${esc(m.guardian)}</div>
+   <div class="act-row"><button class="icon-act ed" onclick="openModelModal(${inlineId(m.id)})">✎</button><button class="icon-act del" onclick="delModel(${inlineId(m.id)})">🗑</button></div>
+   </div></div>`).join('')||'<div class="empty-state" style="grid-column:1/-1">No models yet</div>'}</div>`;
+ }
+}
+function openEventModal(id){
+ const e=id?S.events.find(x=>x.id===id):null;
+ openModal(e?'Edit Event':'New Event',`<div class="form-grid">
+  <div class="full"><label class="f-label">Event title *</label><input class="f-in" name="title" required value="${e?esc(e.title):''}"/></div>
+  <div><label class="f-label">Type</label><select class="f-in" name="type">${['Fashion Show','Photoshoot','Campaign','Pop-up Shop'].map(t=>`<option ${e&&e.type===t?'selected':''}>${t}</option>`).join('')}</select></div>
+  <div><label class="f-label">Date</label><input class="f-in" type="date" name="date" value="${e?e.date:new Date().toISOString().slice(0,10)}"/></div>
+  <div><label class="f-label">Venue</label><input class="f-in" name="venue" value="${e?esc(e.venue):''}"/></div>
+  <div><label class="f-label">Budget ($) *</label><input class="f-in" type="number" min="0" max="100000000" step="0.01" name="budget" required value="${e?esc(e.budget):''}"/></div>
+  <div><label class="f-label">Status</label><select class="f-in" name="status">${['Planned','Live','Completed'].map(s=>`<option ${e&&e.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
+ </div>`,async d=>{
+  const rec={title:clean(d.title),type:d.type,date:d.date,venue:clean(d.venue),budget:+d.budget,status:d.status};
+  if(!rec.title)return toast('Title required','⚠️'),false;
+  try{
+   if(e)await fs.collection('events').doc(e.id).update(rec);
+   else await fs.collection('events').add({...rec,vendorIds:[],modelIds:[],expenses:[]});
+   logAct(`${e?'Updated':'Created'} event "${rec.title}"`);toast('Event saved');return true;
+  }catch(err){toast('Server denied','⚠️');return false;}
+ });
+}
+async function deleteEvent(id){
+ if(!confirm('Delete this event and its recorded expenses?'))return;
+ await deleteRecord('events',id);
+}
+
+
+function openAssignModal(id){
+ const e=S.events.find(x=>x.id===id);if(!e)return;
+ openModal('Assign Team — '+e.title,`
+  <label class="f-label">Operation vendors</label>
+  <div class="check-grid">${S.vendors.map(v=>`<label><input type="checkbox" name="ven" value="${esc(v.id)}" ${(e.vendorIds||[]).includes(v.id)?'checked':''}/> ${esc(v.name)}</label>`).join('')||'<span style="color:var(--mut)">None yet — add vendors first</span>'}</div>
+  <label class="f-label" style="margin-top:1rem">Models</label>
+  <div class="check-grid">${S.models.map(m=>`<label><input type="checkbox" name="mod" value="${esc(m.id)}" ${(e.modelIds||[]).includes(m.id)?'checked':''}/> ${esc(m.name)} (${esc(m.age)}y)</label>`).join('')||'<span style="color:var(--mut)">None yet — add models first</span>'}</div>`,
+ async (d,form)=>{
+  const vendorIds=[...form.querySelectorAll('input[name=ven]:checked')].map(i=>i.value);
+  const modelIds=[...form.querySelectorAll('input[name=mod]:checked')].map(i=>i.value);
+  await fs.collection('events').doc(e.id).update({vendorIds,modelIds});
+  logAct(`Updated team for "${e.title}"`);toast('Team updated','👥');
+ },'Save Team');
+}
+async function addExpense(id){
+ const key='expense/'+id;if(pendingOperations.has(key))return;
+ const desc=clean($('#exd-'+id).value),amount=Number($('#exa-'+id).value);
+ if(!desc||desc.length>200||!Number.isFinite(amount)||amount<=0||amount>1000000)return toast('Enter a description and a positive amount up to 1,000,000.','⚠️');
+ pendingOperations.add(key);
+ try{
+  const entryId=Date.now().toString(36)+'-'+Array.from(crypto.getRandomValues(new Uint32Array(2))).join('-');
+  await fs.collection('events').doc(id).update({expenses:firebase.firestore.FieldValue.arrayUnion({desc,amount,entryId})});
+  logAct(`Added ${money(amount)} expense`);toast('Expense added');
+ }catch(e){toast(errorText(e),'⚠️');}
+ finally{pendingOperations.delete(key);}
+}
+
+
+function openVendorModal(id){
+ const v=id?S.vendors.find(x=>x.id===id):null;
+ openModal(v?'Edit Vendor':'Add Operation Vendor',`<div class="form-grid">
+  <div class="full"><label class="f-label">Company name *</label><input class="f-in" name="name" required value="${v?esc(v.name):''}"/></div>
+  <div><label class="f-label">Service</label><input class="f-in" name="service" value="${v?esc(v.service):''}"/></div>
+  <div><label class="f-label">Contact</label><input class="f-in" name="contact" value="${v?esc(v.contact):''}"/></div>
+  <div><label class="f-label">Rate/event ($)</label><input class="f-in" type="number" min="0" max="1000000" step="0.01" name="rate" value="${v?esc(v.rate):''}"/></div></div>`,
+ async d=>{const rec={name:clean(d.name),service:clean(d.service),contact:clean(d.contact),rate:+d.rate||0};
+  if(!rec.name)return toast('Name required','⚠️'),false;
+  if(v)await fs.collection('vendors').doc(v.id).update(rec);else await fs.collection('vendors').add(rec);
+  toast('Vendor saved');return true;});
+}
+async function delOpVendor(id){if(!confirm('Remove vendor?'))return;await removeAssigned('vendors','vendorIds',id);}
+function openModelModal(id){
+ const m=id?S.models.find(x=>x.id===id):null;
+ openModal(m?'Edit Model':'Add Model',`<div class="form-grid">
+  <div><label class="f-label">Name *</label><input class="f-in" name="name" required value="${m?esc(m.name):''}"/></div>
+  <div><label class="f-label">Age</label><input class="f-in" type="number" min="2" max="14" required name="age" value="${m?esc(m.age):''}"/></div>
+  <div><label class="f-label">Guardian</label><input class="f-in" name="guardian" value="${m?esc(m.guardian):''}"/></div>
+  <div><label class="f-label">Height</label><input class="f-in" name="height" value="${m?esc(m.height):''}"/></div>
+  <div class="full"><label class="f-label">Specialty</label><select class="f-in" name="specialty">${['Runway','Editorial','Commercial'].map(s=>`<option ${m&&m.specialty===s?'selected':''}>${s}</option>`).join('')}</select></div></div>`,
+ async d=>{const rec={name:clean(d.name),age:+d.age,guardian:clean(d.guardian),height:clean(d.height),specialty:d.specialty};
+  if(!rec.name)return toast('Name required','⚠️'),false;
+  if(m)await fs.collection('models').doc(m.id).update(rec);else await fs.collection('models').add(rec);
+  toast('Model saved');return true;});
+}
+async function delModel(id){if(!confirm('Remove model?'))return;await removeAssigned('models','modelIds',id);}
+async function removeAssigned(collection,field,id){
+ try{
+  const assigned=await fs.collection('events').where(field,'array-contains',id).limit(1).get();
+  if(!assigned.empty)return toast('Unassign this record from its events before removing it.','⚠️');
+  await deleteRecord(collection,id);
+ }catch(e){toast(errorText(e),'⚠️');}
+}
+
+/* ============ MARKETING ============ */
+const PLAT_IC={Instagram:'📸',Facebook:'👍',TikTok:'🎵',Pinterest:'📌'};
+$('#postForm').addEventListener('submit',async e=>{
+ e.preventDefault();const form=e.currentTarget,btn=form.querySelector('button[type=submit]');
+ if(btn.disabled||!form.reportValidity())return;
+ if(!['admin','marketer'].includes(user?.role))return toast('Not permitted','⛔');
+ const d=Object.fromEntries(new FormData(form)),caption=clean(d.caption),image=d.image.trim();
+ if(!caption||caption.length>5000)return toast('Caption must contain 1–5,000 characters','⚠️');
+ if(!validUrl(image))return toast('Use an HTTPS image URL','⚠️');
+ let when='';
+ if(d.when){const date=new Date(d.when);if(!Number.isFinite(date.getTime())||date<=new Date())return toast('Choose a future planned date','⚠️');when=date.toISOString();}
+ setBtnLoading(btn,true);
+ try{
+  const previous=S.posts.find(p=>p.id===editingPostId);
+  const record={platform:d.platform,caption,when,image,status:when?'scheduled':'draft',likes:0,shares:0};
+  if(previous?.status==='published'){record.status='published';record.when=previous.when;record.likes=0;record.shares=0;}
+  if(editingPostId)await fs.collection('posts').doc(editingPostId).update(record);
+  else await fs.collection('posts').add(record);
+  logAct('Saved a social content plan');resetComposer(form);toast('Content plan saved; no social post was sent.');
+ }catch(err){toast(errorText(err),'⚠️');}
+ finally{setBtnLoading(btn,false);btn.textContent=editingPostId?'Update Post':'Save Post';}
+});
+function resetComposer(form){
+ form=form||$('#postForm');if(typeof cancelImageUploads==='function')cancelImageUploads(form);form.reset();editingPostId=null;
+ form.querySelectorAll('.upload-note').forEach(n=>n.textContent='JPG, PNG or WebP · up to 5 MB');
+ $('#mcHead').textContent='Create social post';$('#mcSave').textContent='Save Post';$('#mcCancel').style.display='none';
+}
+function editPost(id){
+ const p=S.posts.find(x=>x.id===id),f=$('#postForm');if(!p)return toast('Post no longer available','⚠️');
+ if(typeof cancelImageUploads==='function')cancelImageUploads(f);
+ editingPostId=id;f.elements.platform.value=p.platform;f.elements.caption.value=p.caption;
+ if(p.when&&p.status!=='published'){
+  const d=new Date(p.when);f.elements.when.value=Number.isFinite(d.getTime())?new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16):'';
+ }else f.elements.when.value='';
+ f.elements.image.value=p.image||'';
+ $('#mcHead').textContent='Edit content plan';$('#mcSave').textContent='Update Post';$('#mcCancel').style.display='inline-flex';
+ scrollTo({top:0,behavior:'smooth'});
+}
+async function publishPost(id){
+ if(!confirm('Confirm that YOU already published this on the social platform. This button only records that fact; it does not publish anything.'))return;
+ const btn=document.getElementById('pubBtn-'+id);if(btn?.disabled)return;
+ setBtnLoading(btn,true);
+ try{
+  await fs.collection('posts').doc(id).update({status:'published',when:new Date().toISOString(),likes:0,shares:0});
+  logAct('Manually marked a post as externally published');toast('Marked as published externally.');
+ }catch(e){toast(errorText(e),'⚠️');}
+ finally{setBtnLoading(btn,false);}
+}
+async function deletePost(id){if(confirm('Delete this content plan?'))await deleteRecord('posts',id);}
+
+
+function renderPosts(){
+ const pf=$('#pfFilter').value,ps=$('#psFilter').value;
+ let list=[...S.posts];
+ if(pf)list=list.filter(p=>p.platform===pf);
+ if(ps)list=list.filter(p=>p.status===ps);
+ const pub=S.posts.filter(p=>p.status==='published');
+ const byPlat={};S.posts.forEach(p=>byPlat[p.platform]=(byPlat[p.platform]||0)+1);
+ $('#mktSnapshot').innerHTML=
+  `<div class="planner-stats">
+    <div class="planner-stat"><b>${S.posts.filter(p=>p.status==='draft').length}</b><span>Drafts</span></div>
+    <div class="planner-stat"><b>${S.posts.filter(p=>p.status==='scheduled').length}</b><span>Planned</span></div>
+    <div class="planner-stat"><b>${pub.length}</b><span>Marked published</span></div>
+   </div><p class="planner-note">Counts cover all saved content plans. Publication statuses are recorded by your team; live social engagement is not tracked.</p>`+
+  Object.entries(byPlat).map(([k,v])=>`<div class="insight-li"><span>${PLAT_IC[k]||''}</span><span style="flex:1">${esc(k)}</span><b>${v} saved post${v===1?'':'s'}</b></div>`).join('');
+ $('#postsList').innerHTML=list.sort((a,b)=>(b.when||'').localeCompare(a.when||'')).map(p=>`
+  <div class="post-card">
+   ${p.image?`<img class="post-thumb" src="${esc(p.image)}" alt="" onerror="this.outerHTML='<div class=post-thumb>${PLAT_IC[p.platform]}</div>'"/>`:`<div class="post-thumb">${PLAT_IC[p.platform]}</div>`}
+   <div style="flex:1;min-width:0">
+    <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap"><span class="platform-ic">${PLAT_IC[p.platform]}</span><b style="font-size:.85rem">${esc(p.platform)}</b><span class="pill st-${esc(p.status)}">${esc(p.status)}</span></div>
+    <div class="post-cap">${esc(p.caption)}</div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap">
+      ${p.when?`<span style="font-size:.74rem;color:var(--mut);font-weight:700">📅 ${new Date(p.when).toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span>`:''}
+      ${p.status==='published'?'<span class="eng">Publication recorded manually</span>':''}
+    </div></div>
+   <div class="act-row">
+    ${(p.status!=='published'&&(isAdmin()||user.role==='marketer'))?`<button class="btn btn-t btn-sm" onclick="publishPost(${inlineId(p.id)})" id="pubBtn-${esc(p.id)}">Mark published externally</button>`:''}
+    ${(isAdmin()||user.role==='marketer')?`<button class="icon-act ed" title="Edit" onclick="editPost(${inlineId(p.id)})">✎</button><button class="icon-act del" title="Delete" onclick="deletePost(${inlineId(p.id)})">🗑</button>`:''}
+   </div></div>`).join('')||'<div class="empty-state"><div class="big">📣</div>No posts here yet.</div>';
+}
+
+/* ============ AI FEATURES ============ */
+function hslHex(h,s,l){s/=100;l/=100;const k=n=>(n+h/30)%12,a=s*Math.min(l,1-l),f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));
+ const to=x=>Math.max(0,Math.min(255,Math.round(255*x))).toString(16).padStart(2,'0');return '#'+to(f(0))+to(f(8))+to(f(4));}
+let palRotate=0;
+function genPalette(){
+ const season=$('#palSeason').value,mood=$('#palMood').value;
+ const baseHue={Spring:95,Summer:190,Autumn:25,Winter:215}[season];
+ const adj={Playful:[78,62],Elegant:[38,42],'Eco-Natural':[52,48],'Bold':[88,55]}[mood];
+ palRotate++;
+ const schemes=['Analogous','Complementary','Triadic'];
+ const scheme=schemes[palRotate%schemes.length];
+ const hues=scheme==='Analogous'?[0,22,-22,44,-44]:scheme==='Complementary'?[0,15,-15,180,195]:[0,120,240,15,-105];
+ const hexes=hues.map(off=>hslHex((baseHue+off+360)%360,adj[0]+(off?6:0),off===0?adj[1]:adj[1]+(off>0?10:-6)));
+ $('#swatches').innerHTML=hexes.map(h=>`<div class="swatch" style="background:${h}" onclick="if(navigator.clipboard){navigator.clipboard.writeText('${h}');toast('${h} copied','🎨')}else{toast('Clipboard not available','⚠️')}"><span>${h.toUpperCase()}</span></div>`).join('');
+ $('#palNote').innerHTML=`<b style="color:var(--pink)">${scheme} harmony</b><span>Curated for <b>${season}</b> · <b>${mood}</b>. Click any swatch to copy its hex.</span>`;
+}
+let lastCaps=[];
+function genCaptions(){
+ if(!['admin','designer','documenter','marketer'].includes(user?.role)||$('#templateCaptions').disabled)return;
+ const n=clean($('#capName').value),c=$('#capCat').value;
+ if(!n||n.length>150)return toast('Enter an outfit or collection name up to 150 characters','⚠️');
+ lastCaps=[`Meet ${n}: a closer look at our ${c.toLowerCase()} design journey. #KidsWearFDShow #StudentDesign`,`${n}, from inspiration to the collection story. Follow the FD × BAJMC journey. #FashionDesign #BAJMC`, `Behind the design: ${n}. Discover the ideas and teamwork behind our Kids Wear FD Show. #KidsWearFDShow #DesignProcess`];
+ $('#captionStatus').classList.remove('is-error');$('#captionStatus').textContent='Local templates — no AI request was made.';
+ showCaptions();
+}
+async function copyCaption(i){
+ try{if(!navigator.clipboard)throw new Error('Clipboard unavailable. Select and copy the caption manually.');await navigator.clipboard.writeText(lastCaps[i]||'');toast('Caption copied');}
+ catch(e){toast(e.message,'⚠️');}
+}
+function showCaptions(){
+ $('#capOut').innerHTML=lastCaps.map((caption,i)=>`<div class="cap-var"><p>${esc(caption)}</p><button type="button" class="btn btn-g btn-sm" onclick="copyCaption(${i})">Copy</button> ${['admin','marketer'].includes(user?.role)?`<button type="button" class="btn btn-grape btn-sm" onclick="useCaption(${i})">Use in composer</button>`:''}</div>`).join('');
+}
+function useCaption(i){
+ if(!['admin','marketer'].includes(user?.role))return toast('Copy the caption to share with your marketing team.','⚠️');
+ if($('#postForm').elements.caption.value.trim()&&!confirm('Replace the caption currently in your composer?'))return;
+ go('marketing');$('#postForm').elements.caption.value=lastCaps[i]||'';toast('Caption placed in composer');
+}
+function aiCaptionIntoComposer(){
+ go('ai');$('#capName').focus();
+}
+function renderAI(){if(!$('#swatches').innerHTML)genPalette();const documentary=user.role==='documenter';$('#catalogInsightsPanel').classList.toggle('hidden',documentary);if(!documentary)renderTrends();}
+function renderTrends(){
+ const D=myDesigns();
+ if(!D.length){killChart('tc');killChart('tp');$('#trendInsights').innerHTML='<div class="empty-state">Add designs to see trends</div>';return;}
+ const cats={};D.forEach(d=>cats[d.cat]=(cats[d.cat]||0)+1);
+ const avg={};Object.keys(cats).forEach(c=>{const arr=D.filter(d=>d.cat===c);avg[c]=Math.round(arr.reduce((s,d)=>s+d.price,0)/arr.length);});
+ killChart('tc');killChart('tp');
+ CH.tc=new Chart($('#trendCat'),{type:'doughnut',data:{labels:Object.keys(cats),datasets:[{data:Object.values(cats),backgroundColor:['#ff6b95','#2bb3a3','#ffb84d','#8b7cf6','#4cc47c'],borderWidth:3,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyle:'circle'}}}}});
+ CH.tp=new Chart($('#trendPrice'),{type:'bar',data:{labels:Object.keys(avg),datasets:[{data:Object.values(avg),backgroundColor:'#8b7cf6',borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
+ const apprRate=Math.round(D.filter(d=>d.status==='approved').length/D.length*100);
+ const top=Object.entries(cats).sort((a,b)=>b[1]-a[1])[0];
+ const pricey=Object.entries(avg).sort((a,b)=>b[1]-a[1])[0];
+ $('#trendInsights').innerHTML=[
+  `<div class="insight-li"><span>📈</span><span><b>${esc(top[0])}</b> leads volume (${Math.round(top[1]/D.length*100)}% of collection).</span></div>`,
+  `<div class="insight-li"><span>💎</span><span>Highest price point: <b>${esc(pricey[0])}</b> averaging <b>${money(pricey[1])}</b>.</span></div>`,
+  `<div class="insight-li"><span>✅</span><span>Approval rate: <b>${apprRate}%</b>. ${apprRate>=70?'Healthy pipeline.':'Consider a review workshop.'}</span></div>`
+ ].join('');
+}
+
+/* ============ REPORTS ============ */
+const REPORT_TYPES=[
+ ['jrn','✦','Collection Journeys','Themes, team credits and collection status'],
+ ['inv','📦','Collection Inventory','Catalog with review status'],
+ ['fin','💰','Financial Summary','Budgets, spend & portfolio value'],
+ ['evt','🎪','Event Operations','Budget utilization per event'],
+ ['mkt','📣','Marketing Performance','Channels & engagement']
+];
+const REPORT_ROLES={jrn:['admin',...PUBLIC_ROLES],inv:['admin','designer','analyst'],fin:['admin','coordinator','analyst'],evt:['admin','coordinator','analyst'],mkt:['admin','marketer','analyst']};
+function renderReportTypes(){
+ $('#rtypeGrid').innerHTML=REPORT_TYPES.filter(r=>REPORT_ROLES[r[0]].includes(user.role)).map(r=>`<button class="rtype ${selReport===r[0]?'sel':''}" onclick="selReport='${r[0]}';renderReportTypes()"><div class="ric">${r[1]}</div><b>${r[2]}</b><small>${r[3]}</small></button>`).join('');
+}
+function buildReport(type){
+ if(!user||!REPORT_ROLES[type]?.includes(user.role))throw new Error('Report not permitted for this role.');
+ const D=myDesigns(),now=new Date();
+ const head={title:REPORT_TYPES.find(r=>r[0]===type)[2],by:user.name,date:now.toLocaleString()};
+ let chips=[],sections=[],summary='';
+ if(type==='jrn'){
+  const projects=S.projects||[];
+  chips=[['Collections',projects.length],['Active',projects.filter(p=>!p.archived&&!p.deleting).length],['Archived',projects.filter(p=>p.archived&&!p.deleting).length],['Created by me',projects.filter(p=>p.ownerId===user.uid).length]];
+  sections.push({h:'Collection directory',rows:[['Collection','Theme','Season','Team','Status'],...(projects.length?projects.map(p=>[p.title,p.theme,p.season,p.team,p.deleting?'Deletion in progress':p.archived?'Archived':'Active']):[['—','—','—','—','—']])]});
+  summary='This directory summarizes saved collection records. Open an individual collection and choose Print / save portfolio PDF for its stage evidence, documentation and review feedback.';
+ }
+ if(type==='inv'){
+  const appr=D.filter(d=>d.status==='approved').length,pend=D.filter(d=>d.status==='pending').length,rej=D.filter(d=>d.status==='rejected').length;
+  chips=[['Total Designs',D.length],['Approved',appr],['Pending',pend],['Rejected',rej]];
+  sections.push({h:'Catalog Detail',rows:[['Design','Brand','Category','Season','Price','Status'],...(D.length?D.map(d=>[d.name,d.brand,d.cat,d.season,money(d.price),d.status]):[['—','—','—','—','—','—']])]});
+  summary=D.length?`The catalog holds ${D.length} designs across ${new Set(D.map(d=>d.brand)).size} brands, ${Math.round(appr/D.length*100)}% approved. Average price ${money(Math.round(D.reduce((s,d)=>s+d.price,0)/D.length))}.`:'No designs in the catalog yet.';
+ }
+ if(type==='fin'){
+  if(!S.events.length){summary='No events recorded yet — financial figures unavailable.';}
+  else{
+   const tb=S.events.reduce((s,e)=>s+ +e.budget,0),ts=S.events.reduce((s,e)=>s+evSpent(e),0);
+   chips=[['Event Budgets',money(tb)],['Committed',money(ts)],['Remaining',money(tb-ts)],['Portfolio Value',money(D.filter(d=>d.status==='approved').reduce((s,d)=>s+d.price,0))]];
+   sections.push({h:'Budget Ledger',rows:[['Event','Budget','Spent','Used'],...S.events.map(e=>{const b=+e.budget||0;return[e.title,money(b),money(evSpent(e)),(b?Math.round(evSpent(e)/b*100):0)+'%'];})]});
+   summary=`Across ${S.events.length} events, ${money(ts)} of ${money(tb)} committed (${tb?Math.round(ts/tb*100):0}% utilization).`;
+  }
+ }
+ if(type==='evt'){
+  chips=[['Events',S.events.length],['Planned',S.events.filter(e=>e.status==='Planned').length],['Completed',S.events.filter(e=>e.status==='Completed').length],['Op Vendors',S.vendors.length]];
+  sections.push({h:'Operations Detail',rows:[['Event','Date','Venue','Budget','Spent','Team'],...(S.events.length?S.events.map(e=>[e.title,dstr(e.date),e.venue,money(e.budget),money(evSpent(e)),(e.vendorIds||[]).length+'v · '+(e.modelIds||[]).length+'m']):[['—','—','—','—','—','—']])]});
+  sections.push({h:'Partner Directory',rows:[['Vendor','Service','Rate'],...(S.vendors.length?S.vendors.map(v=>[v.name,v.service,money(v.rate)]):[['—','—','—']])]});
+  summary=`${S.vendors.length} operational partners support ${S.events.length} events with ${S.models.length} rostered models.`;
+ }
+ if(type==='mkt'){
+  const pub=S.posts.filter(p=>p.status==='published');
+  chips=[['Content plans',S.posts.length],['Marked published',pub.length],['Planned',S.posts.filter(p=>p.status==='scheduled').length],['Engagement','Not connected']];
+  const platforms=[...new Set(S.posts.map(p=>p.platform))];
+  sections.push({h:'Content planning by channel',rows:[['Platform','Plans','Marked published'],...platforms.map(k=>[k,S.posts.filter(p=>p.platform===k).length,pub.filter(p=>p.platform===k).length])]});
+  summary='Publishing statuses are manually recorded. Social publishing, scheduling and engagement APIs are not connected. Historical demo metrics are excluded.';
+ }
+
+
+ return {head,chips,summary,sections};
+}
+function generateReport(){
+ if(!selReport||!REPORT_ROLES[selReport]?.includes(user.role))return toast('Pick an allowed report type first','⚠️');
+ lastReport=buildReport(selReport);
+ const r=lastReport;
+ $('#reportSheet').innerHTML=`
+  <div class="rpt-head"><div><h2>${esc(S.studio.studioName)} — ${esc(r.head.title)}</h2><p>Generated ${r.head.date} · by ${esc(r.head.by)} · Confidential</p></div><div style="font-size:2.4rem">👶</div></div>
+  <div class="rpt-summary">${esc(r.summary)}</div>
+  <div class="rpt-chips">${r.chips.map(c=>`<div class="rpt-chip"><b>${c[1]}</b><span>${esc(c[0])}</span></div>`).join('')}</div>
+  ${r.sections.map(s=>`<div class="rpt-sec"><h3>${s.h}</h3><div class="tbl-wrap"><table class="tbl">
+    <tr>${s.rows[0].map(h=>`<th>${esc(h)}</th>`).join('')}</tr>
+    ${s.rows.slice(1).map(row=>`<tr>${row.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}
+  </table></div></div>`).join('')}`;
+ $('#reportSheet').classList.add('show');
+ logAct(`Generated "${r.head.title}"`);toast('Report generated','📑');
+}
+function printReport(){if(!lastReport)return toast('Generate a report first.','⚠️');window.print();}
+function downloadReport(){
+ if(!lastReport)return toast('Generate a report first','⚠️');
+ const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>KidCouture Report</title><style>body{font-family:sans-serif;padding:40px}table{border-collapse:collapse;width:100%;margin:14px 0}td,th{border:1px solid #ccc;padding:8px;font-size:14px}th{background:#232946;color:#fff}h1,h2{color:#232946}</style></head><body>${$('#reportSheet').innerHTML}</body></html>`;
+ const a=document.createElement('a');
+ a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));
+ a.download='kidcouture-report.html';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+/* ============ MY ACCOUNT ============ */
+function renderAccount(){
+ if(!user)return;
+ $('#accountPanel').innerHTML=`<h3>My account</h3><p>Keep your existing login and choose the workspace you need. Saving a different role changes your menu and permissions.</p><form id="accountForm" class="form-grid"><div><label class="f-label" for="accountName">Full name</label><input id="accountName" name="name" class="f-in" required maxlength="100" value="${esc(user.name)}"></div><div><label class="f-label">Email</label><input class="f-in" value="${esc(user.email)}" readonly></div><div class="full"><label class="f-label" for="accountRole">Your role</label>${isAdmin()?'<p>Administrator — reserved for the verified owner email.</p>':`<select class="f-in" id="accountRole" name="role" style="width:100%">${PUBLIC_ROLES.map(r=>`<option value="${r}" ${user.role===r?'selected':''}>${esc(ROLE_META[r].label)}</option>`).join('')}</select>`}</div><p class="full jmuted">Choose the role that reflects your project work. Roles are self-selected; the website does not verify college positions. Your existing collections, uploads and login stay linked to your account.</p><div class="full"><button class="btn btn-p" type="submit">Save account</button></div></form>`;
+ $('#accountForm').onsubmit=saveMyAccount;
+}
+async function saveMyAccount(e){
+ e.preventDefault();const form=e.currentTarget,btn=form.querySelector('button[type=submit]');
+ if(!user||btn.disabled||!form.reportValidity())return;
+ const name=clean(form.elements.name.value),role=isAdmin()?'admin':form.elements.role.value;
+ if(!name||name.length>100||(!isAdmin()&&!PUBLIC_ROLES.includes(role)))return toast('Enter a name and choose a valid role.','⚠️');
+ const uid=user.uid;setBtnLoading(btn,true);
+ try{await fs.doc('users/'+uid).update({name,role});toast('Account saved. Your menu reflects your current role.');}
+ catch(err){toast(errorText(err),'⚠️');}finally{setBtnLoading(btn,false);}
+}
+
+/* ============ USERS & ROLES ============ */
+function renderUsers(){
+ if(!isAdmin())return;
+ $('#userTbl').innerHTML='<tr><th>Member</th><th>Email</th><th>Role</th><th>Status</th><th>Actions</th></tr>'+S.users.map(u=>{
+  const rm=ROLE_META[u.role]||ROLE_META.analyst;
+  const acts=u.id===user.uid?'You':`<button class="btn btn-g btn-sm" onclick="toggleUser(${inlineId(u.id)})">${u.active===true?'Disable':'Enable'}</button> <button class="btn btn-g btn-sm" onclick="changeRole(${inlineId(u.id)})">Change role</button>`;
+  return `<tr><td>${esc(u.name)}</td><td>${esc(u.email)}</td><td>${u.role==='admin'&&!isOwnerEmail(u.email)?'Former admin — assign a role':esc(rm.label)}</td><td>${u.active===true?'Enabled':'Pending / disabled'}</td><td>${acts}</td></tr>`;
+ }).join('');
+ $('#permTbl').innerHTML='<tr><th>Module</th>'+Object.values(ROLE_META).map(r=>`<th>${esc(r.label)}</th>`).join('')+'</tr>'+NAV.map(n=>`<tr><td>${esc(n.label)}</td>${Object.keys(ROLE_META).map(r=>`<td>${n.roles.includes(r)?'Yes':'—'}</td>`).join('')}</tr>`).join('');
+}
+
+
+function openUserModal(){
+ if(!isAdmin())return toast('Administrators only','⛔');
+ openModal('Create Team Account',`<div class="form-grid">
+ <div><label class="f-label">Name</label><input class="f-in" name="name" required maxlength="100"/></div>
+ <div><label class="f-label">Email</label><input class="f-in" name="email" type="email" required maxlength="254"/></div>
+ <div><label class="f-label">Role</label><select class="f-in" name="role">${Object.entries(ROLE_META).filter(([k])=>k!=='admin').map(([k,v])=>`<option value="${k}">${esc(v.label)}</option>`).join('')}</select></div>
+ <div><label class="f-label">Temporary password</label><input class="f-in" type="password" name="password" minlength="6" required autocomplete="new-password"/></div>
+ <p class="full">Creates a member login with immediate access to the selected non-admin role. Share the temporary password securely; the member can use Forgot password to choose a new password.</p></div>`,async d=>{
+  const name=clean(d.name);if(!name)return toast('Name required','⚠️'),false;
+  let sec=null,created=null,profileSaved=false;
+  try{
+   sec=firebase.initializeApp(firebaseConfig,'member-'+Date.now());
+   await sec.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
+   created=(await sec.auth().createUserWithEmailAndPassword(d.email.trim(),d.password)).user;
+   await fs.collection('users').doc(created.uid).set({name,email:created.email,role:d.role,active:true,enrollment:'managed'});profileSaved=true;
+   logAct(`Created account for ${name}`);toast('Team account created. The member can sign in immediately.');return true;
+  }catch(e){
+   let message=errorText(e);
+   if(created&&!profileSaved){try{await created.delete();}catch{message+=' Login cleanup failed; remove the incomplete account in Firebase Authentication.';}}
+   toast(message,'⚠️');return false;
+  }finally{if(sec){await sec.auth().signOut().catch(()=>{});await sec.delete().catch(()=>{});}}
+ });
+}
+async function toggleUser(id){
+ if(!isAdmin()||id===user.uid)return toast('You cannot disable your own account.','⛔');
+ const u=S.users.find(x=>x.id===id);if(!u)return;
+ const active=u.active!==true;
+ if(!confirm(`${active?'Enable':'Disable'} ${u.name}?`))return;
+ try{await fs.collection('users').doc(id).update({active});toast(active?'Account enabled':'Account disabled');}
+ catch(e){toast(errorText(e),'⚠️');}
+}
+function changeRole(id){
+ if(!isAdmin()||id===user.uid)return toast('The configured owner keeps the administrator role.','⛔');
+ const u=S.users.find(x=>x.id===id);if(!u)return;
+ openModal('Change Role — '+u.name,`<label class="f-label">Role</label><select class="f-in" name="role">${Object.entries(ROLE_META).filter(([k])=>k!=='admin').map(([k,v])=>`<option value="${k}" ${u.role===k?'selected':''}>${esc(v.label)}</option>`).join('')}</select>`,async d=>{
+  await fs.collection('users').doc(id).update({role:d.role});logAct(`Changed role for ${u.name}`);toast('Role updated');
+ });
+}
+
+
+/* ============ SETTINGS ============ */
+function renderSettings(){
+ $('#setName').value=S.studio.studioName||'';$('#setTag').value=S.studio.tagline||'';
+}
+async function saveStudio(btn){
+ if(!isAdmin())return toast('Administrators only','⛔');
+ const studioName=clean($('#setName').value),tagline=clean($('#setTag').value);
+ if(!studioName||studioName.length>100||tagline.length>150)return toast('Use a studio name up to 100 and tagline up to 150 characters.','⚠️');
+ setBtnLoading(btn,true);
+ try{await fs.doc('settings/studio').set({studioName,tagline},{merge:true});toast('Studio profile saved');}
+ catch(e){toast(errorText(e),'⚠️');}finally{setBtnLoading(btn,false);}
+}
+
+
+function exportJson(){
+ if(!isAdmin())return toast('Administrators only','⛔');
+ const a=document.createElement('a');
+ a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,2)],{type:'application/json'}));
+ a.download='kidcouture-snapshot.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('Loaded data snapshot exported','⬇️');
+}
+async function loadSampleData(btn){
+ if(!isAdmin()||sampleBusy)return;
+ if(!confirm('Add sample records? Only missing sample IDs will be created.'))return;
+ sampleBusy=true;setBtnLoading(btn,true);
+ const now=new Date().toISOString(),sample={
+  designs:[{id:'sample-raincoat',name:'Sunshine Raincoat',brand:'Sofia Mini',cat:'Seasonal',season:'Autumn',price:89,sizes:'2Y – 10Y',fabric:'Cotton',status:'approved',img:'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?q=80&w=800&auto=format&fit=crop',date:now,ownerId:user.uid,reviewedBy:user.name}],
+  vendors:[{id:'sample-stagecraft',name:'StageCraft Rentals',service:'Stage and lighting',contact:'hello@example.com',rate:1200}],
+  models:[{id:'sample-model',name:'Sample Model',age:7,guardian:'Sample Guardian',height:'122 cm',specialty:'Runway'}],
+  events:[{id:'sample-gala',title:'Sample Fashion Gala',type:'Fashion Show',date:new Date(Date.now()+21*864e5).toISOString().slice(0,10),venue:'Sample Hall',budget:8000,status:'Planned',vendorIds:[],modelIds:[],expenses:[]}],
+  posts:[{id:'sample-post',platform:'Instagram',caption:'Sample caption — edit before publishing.',when:'',status:'draft',likes:0,shares:0,image:''}]
+ };
+ try{
+  const records=Object.entries(sample).flatMap(([col,items])=>items.map(({id,...data})=>({ref:fs.collection(col).doc(id),data})));
+  const count=await fs.runTransaction(async tx=>{
+   const snapshots=[];for(const r of records)snapshots.push(await tx.get(r.ref));
+   let added=0;records.forEach((r,i)=>{if(!snapshots[i].exists){tx.set(r.ref,r.data);added++;}});return added;
+  });
+  logAct(`Added ${count} sample records`);toast(`${count} missing sample records added.`);
+ }catch(e){toast('Sample import failed: '+errorText(e),'⚠️');}
+ finally{sampleBusy=false;setBtnLoading(btn,false);}
+}
+
+
+/* ---------- renderer registry ---------- */
+const RENDER={
+ account:renderAccount,
+ dashboard:renderDashboard,
+ collections:renderCollections,
+ media:renderMedia,
+ events:()=>{if(user&&['admin','coordinator'].includes(user.role)){$$('.tab[data-et]').forEach(t=>t.classList.toggle('active',t.dataset.et===colState.evMode));renderEvents();}},
+ marketing:()=>{if(user&&(user.role==='admin'||user.role==='marketer'))renderPosts();},
+ ai:()=>{if(user)renderAI();},
+ reports:renderReportTypes,
+ users:()=>{if(isAdmin())renderUsers();},
+ settings:()=>{}
+};
+</script>
+<script src="journey.js"></script>
+<script src="integrations.js"></script>
+</body>
+</html>
